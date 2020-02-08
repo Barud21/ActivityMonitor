@@ -1,18 +1,20 @@
 import json
+from _datetime import datetime
 from operator import itemgetter
 
 
 # loads json data to memory
-def defLoadDate(file_name):
-    with open(file_name, 'r') as read_date:
-        dateData = json.load(read_date)
-    return dateData
+def defLoadDate():
+    fileName = datetime.today().strftime('%Y_%m_%d') + ".json"          # opening file with today's date by default
+    with open(fileName, 'r') as read_date:                              # opening file with today's date
+        dateData = json.load(read_date)                                 # loading data to memory
+    return dateData                                                     # returning data
 
 
 # iterates through whole json file
 def defIterateJson(jsonData):
-    for instance in range(len(jsonData)):                   # loop through every major object in list
-        print(json.dumps(jsonData[instance], indent=4))     # printing up the data from json
+    for instance in range(len(jsonData)):                               # loop through every major object in list
+        print(json.dumps(jsonData[instance], indent=4))                 # printing up the data from json
         print('=' * 50)
     return
 
@@ -42,6 +44,6 @@ def defSortingInstances(jsonData):
     return jsonData
 
 
-data = defLoadDate(file_name="2020_02_05.json")
+data = defLoadDate()
 totalUsageTimeForApplication = defSummingUpTotalTime(jsonData=data)
 data = defSortingInstances(data)
