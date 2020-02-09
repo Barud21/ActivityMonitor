@@ -47,3 +47,5 @@ def defSortingInstances(jsonData):
 data = defLoadDate()
 totalUsageTimeForApplication = defSummingUpTotalTime(jsonData=data)
 data = defSortingInstances(data)
+
+$ pip freeze > requirements_br.txt
