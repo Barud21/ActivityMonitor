@@ -38,25 +38,6 @@
                 }
             ],
             "total": 10
-        }
-    ],
-    "Word":
-    [{
-            "detailed_name": "Praca1",
-            "timestamps": [{
-                    "start": "07:02:07",
-                    "end": "12:05:07"
-                }
-            ],
-            "total": 5
-        }, {
-            "detailed_name": "Magisterka na elce",
-            "timestamps": [{
-                    "start": "03:09:54",
-                    "end": "3:30:35"
-                }
-            ],
-            "total": 10
         }, {
             "detailed_name": "Magisterka",
             "timestamps": [{
