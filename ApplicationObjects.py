@@ -3,34 +3,60 @@ from typing import List
 import time #just for test
 import datetime
 
-
 @dataclass
 class TimeStamp:
     start: datetime.datetime
     end: datetime.datetime
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.start == other.start and self.end == other.end
+        return False
+
     def calculateTimeDiffInSecs(self):
-        return (end - start).total_seconds()
+        return int((self.end - self.start).total_seconds())
 
 
 @dataclass
 class DetailedInstance:
     detailedName: str
+    #TODO: Adding list of timestamps (that handles totalTime) through constructor will be handy
     timestamps: List[TimeStamp]
     totalTime: int = 0
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.detailedName == other.detailedName
+
     def addTimeStamp(self, ts: TimeStamp):
-        if not ts in self.timestamps:
+        if ts not in self.timestamps:
             self.timestamps.append(ts)
             self.totalTime += ts.calculateTimeDiffInSecs()
+
+    def getFirstTimeStamp(self):
+        return self.timestamps[0]
 
 
 @dataclass
 class ApplicationWithInstances:
-    name: str
+    appName: str
     instances: List[DetailedInstance]
 
+    #Do we really need this?
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.appName == other.appName
 
+    def updateOrAddInstance(self, di: DetailedInstance):
+        if di not in self.instances:
+            self.instances.append(di)
+        else:
+            for instance in self.instances:
+                if instance == di:
+                    instance.addTimeStamp(di.getFirstTimeStamp())
+
+
+#just for testing new things and playing around
 if __name__ == '__main__':
 
     start = datetime.datetime.now()
@@ -39,15 +65,18 @@ if __name__ == '__main__':
 
     a = TimeStamp(start, end)
     print(a.calculateTimeDiffInSecs())
-    # b = TimeStamp(start=datetime.datetime.now().time().__str__(), end=datetime.datetime.now().time().__str__())
-    #
-    detailed = DetailedInstance('9gag.com', [a])
-    print(detailed)
+
+    detailed = DetailedInstance('9gag.com', [])
+    detailed.addTimeStamp(a)
+
+    entireApp = ApplicationWithInstances('Opera', [detailed])
+    detailed2 = DetailedInstance('youtube.com', [])
 
     start = datetime.datetime.now()
     time.sleep(2)
     end = datetime.datetime.now()
-
     b = TimeStamp(start, end)
-    detailed.addTimeStamp(b)
-    print(detailed)
+
+    detailed2.addTimeStamp(b)
+
+    entireApp.updateOrAddInstance(detailed2)

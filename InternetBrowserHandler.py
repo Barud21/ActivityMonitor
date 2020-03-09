@@ -3,7 +3,8 @@ import re
 
 
 class InternetBrowserHandler:
-
+    #TODO: From time to time the browser doesnt return any url - find the cause and hadnle it
+    #iterate through all controls in the browser tab, url is in one of them, that has type = Edit
     def __findPotentialUrlsFromBrowser (self, dialog):
         # fetched_url = dlg.child_window(title="Pole adresu", control_type="Edit").get_value()
         # below is a workaround to avoid language specific names
@@ -16,7 +17,8 @@ class InternetBrowserHandler:
 
         return potential_urls
 
-    def __findUrlInStringList (self,potential_urls):
+    #goes through list of strings, if it finds that some string is an url then returns immediately; otherwise returns empty string
+    def __findUrlInStringList (self, potential_urls):
         urlFound = False
         for maybeUrl in potential_urls:
             result_tuple = self.__isStringAnUrl(maybeUrl)
@@ -44,7 +46,8 @@ class InternetBrowserHandler:
         else:
             return (True, mo.group(2))
 
-
+    #TODO: Catch something specific in that lonely 'except' in the second try
+    #connects to an application and tries to get an url of opened webpage if possible
     def connectToHndlFetchPossibleUrl(self, win_hndl):
         app = Application(backend='uia')
 
