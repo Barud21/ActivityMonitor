@@ -40,7 +40,7 @@ class Logger:
         else:
             detailedName = windowName
         #TODO: Make sure this works 100% (should have correct timestamp and totalTime)
-        return Ao.DetailedInstance(detailedName, [timestamp], timestamp.calculateTimeDiffInSecs())
+        return Ao.DetailedInstance(detailedName, [timestamp])
 
     #adds a new application if not logged before or updates the existing one
     def __updateApplicationsList(self, windowName, appName, url, startTime, endTime):

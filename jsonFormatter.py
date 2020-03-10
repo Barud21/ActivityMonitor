@@ -93,20 +93,15 @@ if __name__ == '__main__':
     a = Ao.TimeStamp(start, end)
     b = Ao.TimeStamp(start2, end2)
 
-    detailed_1 = Ao.DetailedInstance('youtube.com', [])
-    detailed_1.addTimeStamp(a)
-    detailed_1.addTimeStamp(b)
-
-    detailed_2 = Ao.DetailedInstance('9gag.com', [])
-    detailed_2.addTimeStamp(a)
+    detailed_1 = Ao.DetailedInstance('youtube.com', [a, b])
+    detailed_2 = Ao.DetailedInstance('9gag.com', [a])
 
     entireApp = Ao.ApplicationWithInstances('Opera', [])
     entireApp.updateOrAddInstance(detailed_1)
     entireApp.updateOrAddInstance(detailed_2)
 
 
-    detailed_3 = Ao.DetailedInstance('MyNovelFinalEditLast7.docx', [])
-    detailed_3.addTimeStamp(a)
+    detailed_3 = Ao.DetailedInstance('MyNovelFinalEditLast7.docx', [a])
 
     entireApp2 = Ao.ApplicationWithInstances('Word', [])
     entireApp2.updateOrAddInstance(detailed_3)

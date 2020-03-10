@@ -20,9 +20,14 @@ class TimeStamp:
 @dataclass
 class DetailedInstance:
     detailedName: str
-    #TODO: Adding list of timestamps (that handles totalTime) through constructor will be handy
     timestamps: List[TimeStamp]
     totalTime: int = 0
+
+    def __init__(self, detailedName, timestamps):
+        self.detailedName = detailedName
+        self.timestamps = []
+        for ts in timestamps:
+            self.addTimeStamp(ts)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -66,17 +71,15 @@ if __name__ == '__main__':
     a = TimeStamp(start, end)
     print(a.calculateTimeDiffInSecs())
 
-    detailed = DetailedInstance('9gag.com', [])
-    detailed.addTimeStamp(a)
+    detailed = DetailedInstance('9gag.com', [a])
 
     entireApp = ApplicationWithInstances('Opera', [detailed])
-    detailed2 = DetailedInstance('youtube.com', [])
 
     start = datetime.datetime.now()
     time.sleep(2)
     end = datetime.datetime.now()
     b = TimeStamp(start, end)
 
-    detailed2.addTimeStamp(b)
+    detailed2 = DetailedInstance('youtube.com', [a, b])
 
     entireApp.updateOrAddInstance(detailed2)
