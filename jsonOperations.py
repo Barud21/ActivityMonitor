@@ -35,13 +35,13 @@ def defSummingUpTotalTime(jsonData):
         totalTimeForApplication[applicationKey[keyNumber]]['Usage time'] = timeTotal
     for keyNumber in range(len(totalTimeForApplication)):
         applicationKey = list(totalTimeForApplication.keys())
-        timePercentage = round(totalTimeForApplication[applicationKey[keyNumber]]['Usage time'] / totalTimeForAllApps, 2)
+        timePercentage = round(totalTimeForApplication[applicationKey[keyNumber]]['Usage time'] / totalTimeForAllApps * 100, 2)
         totalTimeForApplication[applicationKey[keyNumber]]['Percentage time of use'] = timePercentage
     totalTimeForApplication = sorted(totalTimeForApplication.items(), key=lambda x: x[1]["Usage time"],
                                      reverse=True)  # sorting dictionary in descending order
     # timeTotal = time.strftime('%Hh %Mm %Ss', time.gmtime(timeTotal))      może zmienić w format czasu w liście a może nie
-    print(totalTimeForApplication)
-    print('=' * 50)
+    #print(totalTimeForApplication)
+    #print('=' * 50)
     return totalTimeForApplication
 
 
@@ -58,8 +58,10 @@ def defPrintingInstances(jsonData, instanceName):
 
 data = defLoadDate()
 totalUsageTimeForApplication = defSummingUpTotalTime(jsonData=data)
+print()
+print(totalUsageTimeForApplication[0][1]['Percentage time of use'])
+print()
 data = defSortingInstances(data)
-instance = ''
-instance = input("Please give the name of application ")
-defPrintingInstances(data, instanceName=instance)
+
+
 defIterateJson(data)
