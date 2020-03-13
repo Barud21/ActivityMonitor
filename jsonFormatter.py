@@ -4,23 +4,21 @@ import time
 import datetime
 
 
-#TODO: Make naming of all fields consistent; camelCase?
 #Allows to specify how object of our custom classes should be represented as json
 class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Ao.TimeStamp):
             return{
-                #split to remove the micrseconds part, they are after the only coma in the string representation
+                #split to remove the microseconds part, they are after the only coma in the string representation
                 #without split it looks like: 20:11:48.098846
-                "start": str(obj.start.time()).split('.')[0],
-                "end": str(obj.end.time()).split('.')[0]
+                "start": str(obj.start).split('.')[0],
+                "end": str(obj.end).split('.')[0]
             }
         elif isinstance(obj, Ao.DetailedInstance):
             return {
-                "detailed_name": obj.detailedName,
+                "detailedName": obj.detailedName,
                 "timestamps": obj.timestamps,
-                #TODO:Change to totalTime, so .json file will be self explanatory
-                "total": obj.totalTime
+                "totalTime": obj.totalTime
             }
         elif isinstance(obj, Ao.ApplicationWithInstances):
             return {
@@ -28,7 +26,7 @@ class CustomJsonEncoder(json.JSONEncoder):
                 'instances': obj.instances
             }
         # to raise the TypeError when needed
-        return super(CustomJsonEncoder, self).default(obj)
+        return json.JSONEncoder.default(obj)
 
 
 #Allows to specify the rules based on which we are deserializing the json into objects of our custom classes
@@ -36,7 +34,7 @@ class CustomJsonDecoder(json.JSONDecoder):
     #lists with keys, that will be present when our object is __dict__'ed; used for easier object checks in deserialization
     #must map list of keys present in the json file
     timestampElements = ['start', 'end']
-    detailedInstanceElements = ['detailed_name', 'timestamps', 'total']
+    detailedInstanceElements = ['detailedName', 'timestamps', 'totalTime']
     applicationElements = ['appName', 'instances']
 
     def __init__(self, *args, **kwargs):
@@ -51,19 +49,15 @@ class CustomJsonDecoder(json.JSONDecoder):
         detected_keys.sort()
 
         if detected_keys == self.timestampElements:
-            #TODO: Take care of datetime.now(); this can be a mess when we load files from previous days; but on the other hand it may actually work well if all dates in one file will be set as the same day.
-            year = datetime.datetime.now().year
-            month = datetime.datetime.now().month
-            day = datetime.datetime.now().day
             startHours, startMinutes, startSeconds = obj['start'].split(':')
             endHours, endMinutes, endSeconds = obj['end'].split(':')
 
-            startTime = datetime.datetime(year, month, day, int(startHours), int(startMinutes), int(startSeconds))
-            endTime = datetime.datetime(year, month, day, int(endHours), int(endMinutes), int(endSeconds))
+            startTime = datetime.time(int(startHours), int(startMinutes), int(startSeconds))
+            endTime = datetime.time(int(endHours), int(endMinutes), int(endSeconds))
             return Ao.TimeStamp(startTime, endTime)
 
         elif detected_keys == self.detailedInstanceElements:
-            detailed_name = obj['detailed_name']
+            detailed_name = obj['detailedName']
             detailed = Ao.DetailedInstance(detailed_name, [])
             for ts in obj['timestamps']:
                 detailed.addTimeStamp(ts)
@@ -82,13 +76,13 @@ class CustomJsonDecoder(json.JSONDecoder):
 
 #just for testing new things and playing around
 if __name__ == '__main__':
-    start = datetime.datetime.now()
+    start = datetime.datetime.now().time()
     time.sleep(2)
-    end = datetime.datetime.now()
+    end = datetime.datetime.now().time()
 
-    start2 = datetime.datetime.now()
+    start2 = datetime.datetime.now().time()
     time.sleep(2)
-    end2 = datetime.datetime.now()
+    end2 = datetime.datetime.now().time()
 
     a = Ao.TimeStamp(start, end)
     b = Ao.TimeStamp(start2, end2)

@@ -5,8 +5,8 @@ import datetime
 
 @dataclass
 class TimeStamp:
-    start: datetime.datetime
-    end: datetime.datetime
+    start: datetime.time
+    end: datetime.time
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -14,14 +14,18 @@ class TimeStamp:
         return False
 
     def calculateTimeDiffInSecs(self):
-        return int((self.end - self.start).total_seconds())
+        placeholder_date = datetime.datetime(datetime.MINYEAR, 1, 1)
+        new_start_datetime = datetime.datetime.combine(placeholder_date, self.start)
+        new_end_datetime = datetime.datetime.combine(placeholder_date, self.end)
+
+        return int((new_end_datetime - new_start_datetime).total_seconds())
 
 
 @dataclass
 class DetailedInstance:
     detailedName: str
     timestamps: List[TimeStamp]
-    totalTime: int = 0
+    totalTime: int = 0  #in seconds
 
     def __init__(self, detailedName, timestamps):
         self.detailedName = detailedName
@@ -38,11 +42,13 @@ class DetailedInstance:
             self.timestamps.append(ts)
             self.totalTime += ts.calculateTimeDiffInSecs()
 
+    #TODO: do we really need this?
     def getFirstTimeStamp(self):
         return self.timestamps[0]
 
 
 @dataclass
+#TODO: add detailed instance through constructor
 class ApplicationWithInstances:
     appName: str
     instances: List[DetailedInstance]
@@ -57,16 +63,16 @@ class ApplicationWithInstances:
             self.instances.append(di)
         else:
             for instance in self.instances:
-                if instance == di:
+                if instance == di: #comparing them by names DetailedInstance.detailedName
                     instance.addTimeStamp(di.getFirstTimeStamp())
 
 
 #just for testing new things and playing around
 if __name__ == '__main__':
 
-    start = datetime.datetime.now()
+    start = datetime.datetime.now().time()
     time.sleep(2)
-    end = datetime.datetime.now()
+    end = datetime.datetime.now().time()
 
     a = TimeStamp(start, end)
     print(a.calculateTimeDiffInSecs())
@@ -75,9 +81,9 @@ if __name__ == '__main__':
 
     entireApp = ApplicationWithInstances('Opera', [detailed])
 
-    start = datetime.datetime.now()
+    start = datetime.datetime.now().time()
     time.sleep(2)
-    end = datetime.datetime.now()
+    end = datetime.datetime.now().time()
     b = TimeStamp(start, end)
 
     detailed2 = DetailedInstance('youtube.com', [a, b])

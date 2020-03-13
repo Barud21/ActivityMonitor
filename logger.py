@@ -39,7 +39,6 @@ class Logger:
             detailedName = url
         else:
             detailedName = windowName
-        #TODO: Make sure this works 100% (should have correct timestamp and totalTime)
         return Ao.DetailedInstance(detailedName, [timestamp])
 
     #adds a new application if not logged before or updates the existing one
@@ -80,11 +79,11 @@ class Logger:
                           ending_time.time(),
                           (ending_time - beginning_time).total_seconds()
                           )
-                    self.__updateApplicationsList(prev_text, prevAppName, prevUrl, beginning_time, ending_time)
+                    self.__updateApplicationsList(prev_text, prevAppName, prevUrl, beginning_time.time(), ending_time.time())
 
                     beginning_time = datetime.datetime.now()
 
-
+            #TODO: Maybe should be moved to if? Potential problem when currentAppName is not assigned yet
             prevAppName = currentAppName
             prevUrl = currentUrl
             prev_text = current_text
