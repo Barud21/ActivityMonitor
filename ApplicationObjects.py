@@ -8,11 +8,6 @@ class TimeStamp:
     start: datetime.time
     end: datetime.time
 
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.start == other.start and self.end == other.end
-        return False
-
     def calculateTimeDiffInSecs(self):
         placeholder_date = datetime.datetime(datetime.MINYEAR, 1, 1)
         new_start_datetime = datetime.datetime.combine(placeholder_date, self.start)
@@ -27,44 +22,32 @@ class DetailedInstance:
     timestamps: List[TimeStamp]
     totalTime: int = 0  #in seconds
 
-    def __init__(self, detailedName, timestamps):
-        self.detailedName = detailedName
-        self.timestamps = []
-        for ts in timestamps:
-            self.addTimeStamp(ts)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.detailedName == other.detailedName
+    def __post_init__(self):
+        for ts in self.timestamps:
+            self.totalTime += ts.calculateTimeDiffInSecs()
 
     def addTimeStamp(self, ts: TimeStamp):
         if ts not in self.timestamps:
             self.timestamps.append(ts)
             self.totalTime += ts.calculateTimeDiffInSecs()
 
-    #TODO: do we really need this?
-    def getFirstTimeStamp(self):
-        return self.timestamps[0]
-
 
 @dataclass
-#TODO: add detailed instance through constructor
 class ApplicationWithInstances:
     appName: str
     instances: List[DetailedInstance]
 
-    #Do we really need this?
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.appName == other.appName
-
     def updateOrAddInstance(self, di: DetailedInstance):
-        if di not in self.instances:
+        instanceDetailedNames = [x.detailedName for x in self.instances]
+
+        if di.detailedName not in instanceDetailedNames:
             self.instances.append(di)
         else:
             for instance in self.instances:
-                if instance == di: #comparing them by names DetailedInstance.detailedName
-                    instance.addTimeStamp(di.getFirstTimeStamp())
+                if di.detailedName == instance.detailedName:
+                    for ts in di.timestamps:
+                        instance.addTimeStamp(ts)
+                    break
 
 
 #just for testing new things and playing around
@@ -75,11 +58,10 @@ if __name__ == '__main__':
     end = datetime.datetime.now().time()
 
     a = TimeStamp(start, end)
-    print(a.calculateTimeDiffInSecs())
-
     detailed = DetailedInstance('9gag.com', [a])
 
     entireApp = ApplicationWithInstances('Opera', [detailed])
+
 
     start = datetime.datetime.now().time()
     time.sleep(2)
@@ -89,3 +71,12 @@ if __name__ == '__main__':
     detailed2 = DetailedInstance('youtube.com', [a, b])
 
     entireApp.updateOrAddInstance(detailed2)
+
+    start = datetime.datetime.now().time()
+    time.sleep(2)
+    end = datetime.datetime.now().time()
+    c = TimeStamp(start, end)
+    detailed3 = DetailedInstance('9gag.com', [c])
+
+    entireApp.updateOrAddInstance(detailed3)
+    print(entireApp)
