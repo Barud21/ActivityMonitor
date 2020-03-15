@@ -1,9 +1,10 @@
-from pywinauto import Application
+from pywinauto import Application, findwindows
 import re
+import sys
 
 
 class InternetBrowserHandler:
-    #TODO: From time to time the browser doesnt return any url - find the cause and hadnle it
+    #TODO: From time to time the browser doesnt return any url - find the cause and hadnle it. Maybe cache a list of apps that had some urls in the past and when such app has entry without an url then retry it?
     #iterate through all controls in the browser tab, url is in one of them, that has type = Edit
     def __findPotentialUrlsFromBrowser (self, dialog):
         # fetched_url = dlg.child_window(title="Pole adresu", control_type="Edit").get_value()
@@ -12,8 +13,9 @@ class InternetBrowserHandler:
         for d in dialog.descendants():
             control_type = d._BaseWrapper__repr_texts()[2]
             if control_type == 'Edit':  # in one of these fields, url is hidden (tested only for chromium)
-                control_name = d._BaseWrapper__repr_texts()[1]
-                potential_urls.append(dialog.child_window(title=control_name, control_type="Edit").get_value())
+                control_text = d.get_value()
+                if control_text != '':
+                    potential_urls.append(control_text)
 
         return potential_urls
 
@@ -46,7 +48,6 @@ class InternetBrowserHandler:
         else:
             return (True, mo.group(2))
 
-    #TODO: Catch something specific in that lonely 'except' in the second try
     #connects to an application and tries to get an url of opened webpage if possible
     def connectToHndlFetchPossibleUrl(self, win_hndl):
         app = Application(backend='uia')
@@ -58,11 +59,7 @@ class InternetBrowserHandler:
             print('Couldnt connect to last application :(')
             fetched_url = ''
         else:
-            try:
-                potential_urls = self.__findPotentialUrlsFromBrowser(dlg)
-            except:
-                fetched_url = ''
-            else:
-                fetched_url = self.__findUrlInStringList(potential_urls)
+            potential_urls = self.__findPotentialUrlsFromBrowser(dlg)
+            fetched_url = self.__findUrlInStringList(potential_urls)
 
         return fetched_url

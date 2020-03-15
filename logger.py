@@ -83,10 +83,9 @@ class Logger:
 
                     beginning_time = datetime.datetime.now()
 
-            #TODO: Maybe should be moved to if? Potential problem when currentAppName is not assigned yet
-            prevAppName = currentAppName
-            prevUrl = currentUrl
-            prev_text = current_text
+                prevAppName = currentAppName
+                prevUrl = currentUrl
+                prev_text = current_text
 
             time.sleep(self.scanning_interval)
 
