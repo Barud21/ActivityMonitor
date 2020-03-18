@@ -14,7 +14,7 @@ def graph():
     summedTime = defSummingUpTotalTime(jsonData=data)
     house_prices = [summedTime[0][1]["Percentage time of use"], summedTime[1][1]["Percentage time of use"] , summedTime[2][1]["Percentage time of use"]]
     plt.pie(house_prices, autopct="%1.1f%%")
-    plt.show()
+    plt.draw()
 
 my_button = Button(root, text = "Graph it!", command = graph)
 my_button.pack()
