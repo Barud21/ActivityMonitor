@@ -56,6 +56,12 @@ class ApplicationWithInstances:
 
 
 
+    def sumOfTotalTimeForApplication(self):
+        totalTimeForApp = 0
+        for instance in self.instances:
+            totalTimeForApp += instance.totalTime
+        return totalTimeForApp
+
 
 #just for testing new things and playing around
 if __name__ == '__main__':
@@ -95,3 +101,5 @@ if __name__ == '__main__':
 
     entireApp2.updateBasedOnOther(entireApp)
     print(entireApp2)
+
+    print(entireApp.sumOfTotalTimeForApplication())
