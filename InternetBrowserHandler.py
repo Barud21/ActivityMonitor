@@ -1,6 +1,5 @@
-from pywinauto import Application, findwindows
+from pywinauto import Application
 import re
-import sys
 
 
 class InternetBrowserHandler:

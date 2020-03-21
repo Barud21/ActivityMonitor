@@ -7,12 +7,21 @@ import time
 from InternetBrowserHandler import InternetBrowserHandler
 import ApplicationObjects as Ao
 
+import os
+import json
+import jsonFormatter
+
 
 class Logger:
     def __init__(self):
-        self.scanning_interval = 5  # seconds
+        self.scanningInterval = 5  # seconds
+        self.fileWritingInterval = 30  # seconds
+        self.filesDirName = 'GeneratedFiles'
         self.InternetBrowser = InternetBrowserHandler()
         self.applications = []
+
+        if not os.path.isdir(self.filesDirName):
+            os.mkdir(self.filesDirName)
 
     #gets process name for a given windows handle
     def __getAppNameFromHndl (self, win_hndl):
@@ -55,22 +64,69 @@ class Logger:
                     application.updateOrAddInstance(detailedInst)
                     break
 
+     #takes other application list and extends it (only addition is done) based on the self.applications
+    def __updateOtherAplicationsList(self, other):
+        for loggedApp in self.applications:
+            if loggedApp.appName not in [x.appName for x in other]:         #add new ApplicationWithInstances
+                other.append(loggedApp)
+            else:         #update already existing ones
+                for nd_app in other:
+                    if nd_app.appName == loggedApp.appName:
+                        nd_app.updateBasedOnOther(loggedApp)
+
+    #TODO: Make it async (threading) - what about exceptions in thread?
+    def _updateFile(self):
+        print('starting file update')
+
+        file_name = datetime.datetime.today().strftime('%Y_%m_%d') + ".json"
+        file_path = os.path.join(self.filesDirName, file_name)
+
+        #open file and read data from it
+        try:
+            with open(file_path, 'r') as file:
+                loaded_data = json.load(file, cls=jsonFormatter.CustomJsonDecoder)
+        except FileNotFoundError:
+            with open(file_path, 'w') as file:
+                pass    #just create an empty file
+            loaded_data = []
+        except json.decoder.JSONDecodeError:
+            #TODO: do we really want to exit now?
+            print('File is corrupted, exiting ;(')
+            exit()
+
+        #create new application list, update loaded data with self.applications
+        new_data = loaded_data
+        self.__updateOtherAplicationsList(new_data)
+
+        #serialize new list to json string
+        json_new_data = json.dumps(new_data, cls=jsonFormatter.CustomJsonEncoder)
+
+        #save new data to file
+        with open(file_path, 'w') as file:
+            file.write(json_new_data)
+
+        #clear self.applications, we dont want to store things we already wrote to file
+        self.applications.clear()
+
+        print(new_data)
 
     #main loop, that will periodically scan for an application change and update objects on internal list of applications
     def scan(self):
         prev_text, prevAppName, prevUrl = '', '', ''
         beginning_time = datetime.datetime.now()
+        writingTimePoint = datetime.datetime.now()
 
         while True:
             win_hndl = win32gui.GetForegroundWindow()
             current_text = win32gui.GetWindowText(win_hndl)
-
             if current_text != prev_text:
                 currentAppName, currentUrl = self.__getCurrentAppNameAndPossibleUrl(win_hndl)
                 # (application changed) OR (the same app but different url) OR (the same app but different window name and no url found)
-                if (prevAppName != currentAppName) or \
+                #check for prev_text and prevAppName != '' to prevent from the first empty entry which was always added on startup
+                if ((prevAppName != currentAppName) or \
                         ((prevAppName == currentAppName) and
-                         ((prevUrl != currentUrl) or (currentUrl == prevUrl == '' and prev_text != current_text))):
+                         ((prevUrl != currentUrl) or (currentUrl == prevUrl == '' and prev_text != current_text))))\
+                        and (prev_text != '' and prevAppName != ''):
                     ending_time = datetime.datetime.now()
                     print(prev_text,
                           prevAppName,
@@ -87,7 +143,12 @@ class Logger:
                 prevUrl = currentUrl
                 prev_text = current_text
 
-            time.sleep(self.scanning_interval)
+            if (datetime.datetime.now() - writingTimePoint).total_seconds() > self.fileWritingInterval:
+                if len(self.applications) > 0:
+                    self._updateFile()
+                writingTimePoint = datetime.datetime.now()
+
+            time.sleep(self.scanningInterval)
 
 
 if __name__ == '__main__':

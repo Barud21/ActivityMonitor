@@ -49,6 +49,13 @@ class ApplicationWithInstances:
                         instance.addTimeStamp(ts)
                     break
 
+    def updateBasedOnOther(self, other):
+        if self.appName == other.appName:
+            for i in other.instances:
+                self.updateOrAddInstance(i)
+
+
+
 
 #just for testing new things and playing around
 if __name__ == '__main__':
@@ -80,3 +87,11 @@ if __name__ == '__main__':
 
     entireApp.updateOrAddInstance(detailed3)
     print(entireApp)
+
+    detailed4 = DetailedInstance('SwiatMakaronow.com', [a])
+    detailed5 = DetailedInstance('9gag.com', [a])
+    entireApp2 = ApplicationWithInstances('Opera', [detailed4, detailed5])
+
+
+    entireApp2.updateBasedOnOther(entireApp)
+    print(entireApp2)
