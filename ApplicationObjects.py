@@ -49,6 +49,12 @@ class ApplicationWithInstances:
                         instance.addTimeStamp(ts)
                     break
 
+    def sumOfTotalTimeForApplication(self):
+        totalTimeForApp = 0
+        for instance in self.instances:
+            totalTimeForApp += instance.totalTime
+        return totalTimeForApp
+
 
 #just for testing new things and playing around
 if __name__ == '__main__':
@@ -80,3 +86,5 @@ if __name__ == '__main__':
 
     entireApp.updateOrAddInstance(detailed3)
     print(entireApp)
+
+    print(entireApp.sumOfTotalTimeForApplication())
