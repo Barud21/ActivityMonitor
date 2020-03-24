@@ -4,7 +4,7 @@ import jsonFormatter as jF
 
 
 def defDecodingJson():
-    fileName = datetime.today().strftime('JSON_files/%Y_%m_%d') + ".json"
+    fileName = datetime.today().strftime('GeneratedFiles/%Y_%m_%d') + ".json"
 
     with open(fileName, 'r') as read_date:                              # opening file with today's date
         jsonData = json.load(read_date, cls=jF.CustomJsonDecoder)       # loading data to memory
