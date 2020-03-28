@@ -1,0 +1,32 @@
+[
+    {
+        "appName": "opera",
+        "instances": [
+            {
+                "detailedName": "youtube.com",
+                "timestamps": [
+                    {
+                        "start": "20:03:08",
+                        "end": "20:03:10"
+                    }
+                ],
+                "totalTime": 2
+            }
+        ]
+    },
+    {
+        "appName": "word",
+        "instances": [
+            {
+                "detailedName": "MyNovelFinalEditLast7.docx",
+                "timestamps": [
+                    {
+                        "start": "20:07:10",
+                        "end": "20:07:30"
+                    }
+                ],
+                "totalTime": 20
+            }
+        ]
+    }
+]

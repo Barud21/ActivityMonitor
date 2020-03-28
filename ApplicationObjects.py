@@ -20,7 +20,7 @@ class TimeStamp:
 class DetailedInstance:
     detailedName: str
     timestamps: List[TimeStamp]
-    totalTime: int = 0  #in seconds
+    totalTime: int = 0  # in seconds
 
     def __post_init__(self):
         for ts in self.timestamps:
@@ -63,7 +63,7 @@ class ApplicationWithInstances:
         return totalTimeForApp
 
 
-#just for testing new things and playing around
+# just for testing new things and playing around
 if __name__ == '__main__':
 
     start = datetime.datetime.now().time()

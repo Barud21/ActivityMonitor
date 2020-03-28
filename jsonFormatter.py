@@ -1,16 +1,15 @@
 import ApplicationObjects as Ao
 import json
-import time
 import datetime
 
 
-#Allows to specify how object of our custom classes should be represented as json
+# Allows to specify how object of our custom classes should be represented as json
 class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Ao.TimeStamp):
             return{
-                #split to remove the microseconds part, they are after the only coma in the string representation
-                #without split it looks like: 20:11:48.098846
+                # split to remove the microseconds part, they are after the only coma in the string representation
+                # without split it looks like: 20:11:48.098846
                 "start": str(obj.start).split('.')[0],
                 "end": str(obj.end).split('.')[0]
             }
@@ -29,10 +28,10 @@ class CustomJsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(obj)
 
 
-#Allows to specify the rules based on which we are deserializing the json into objects of our custom classes
+# Allows to specify the rules based on which we are deserializing the json into objects of our custom classes
 class CustomJsonDecoder(json.JSONDecoder):
-    #lists with keys, that will be present when our object is __dict__'ed; used for easier object checks in deserialization
-    #must map list of keys present in the json file
+    # lists with keys, that will be present when our object is __dict__'ed; used for easier object checks in deserialization
+    # must map list of keys present in the json file
     timestampElements = ['start', 'end']
     detailedInstanceElements = ['detailedName', 'timestamps', 'totalTime']
     applicationElements = ['appName', 'instances']
@@ -48,6 +47,8 @@ class CustomJsonDecoder(json.JSONDecoder):
         detected_keys = list(obj.keys())
         detected_keys.sort()
 
+        # deserializing based on the keys in the dict.
+        # If we found a dict, that has the keys as in our template list, then create object of given class
         if detected_keys == self.timestampElements:
             startHours, startMinutes, startSeconds = obj['start'].split(':')
             endHours, endMinutes, endSeconds = obj['end'].split(':')
@@ -72,39 +73,3 @@ class CustomJsonDecoder(json.JSONDecoder):
 
         else:
             return obj
-
-
-#just for testing new things and playing around
-if __name__ == '__main__':
-    start = datetime.datetime.now().time()
-    time.sleep(2)
-    end = datetime.datetime.now().time()
-
-    start2 = datetime.datetime.now().time()
-    time.sleep(2)
-    end2 = datetime.datetime.now().time()
-
-    a = Ao.TimeStamp(start, end)
-    b = Ao.TimeStamp(start2, end2)
-
-    detailed_1 = Ao.DetailedInstance('youtube.com', [a, b])
-    detailed_2 = Ao.DetailedInstance('9gag.com', [a])
-
-    entireApp = Ao.ApplicationWithInstances('Opera', [])
-    entireApp.updateOrAddInstance(detailed_1)
-    entireApp.updateOrAddInstance(detailed_2)
-
-
-    detailed_3 = Ao.DetailedInstance('MyNovelFinalEditLast7.docx', [a])
-
-    entireApp2 = Ao.ApplicationWithInstances('Word', [])
-    entireApp2.updateOrAddInstance(detailed_3)
-
-    AppsList = [entireApp, entireApp2]
-    print(AppsList)
-    encodedTs = json.dumps(AppsList, cls=CustomJsonEncoder)
-    print(encodedTs)
-    decoded = json.loads(encodedTs, cls=CustomJsonDecoder)
-    print('Decoded', decoded)
-
-
