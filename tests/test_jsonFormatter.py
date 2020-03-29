@@ -1,7 +1,6 @@
 import jsonFormatter
 import json
-import ApplicationObjects as Ao
-import helper as Hlp
+import testsHelper as Hlp  # TODO: Think about this problem with 'No module...' err
 import pytest
 
 
@@ -9,15 +8,15 @@ import pytest
 # Serialization tests
 #################################################################################################
 
-@pytest.mark.parametrize('timestamps, resultFilePath',
+@pytest.mark.parametrize('timeDigitsTupList, resultFilePath',
                          [
                              ([([20, 3, 8], [20, 3, 18])], 'test_data/t1.json'),
                              ([([20, 3, 8], [20, 3, 18]), ([20, 3, 22], [20, 3, 24])], 'test_data/t2.json')
 
                          ])
-def test_serialization_timestamps(timestamps, resultFilePath):
+def test_serialization_timestamps(timeDigitsTupList, resultFilePath):
     # arrange
-    appList = [Hlp.createBasicApp(timestamps, 'youtube.com', 'opera')]
+    appList = [Hlp.createBasicApp(timeDigitsTupList, 'youtube.com', 'opera')]
     expected_result = Hlp.getResultFromFile(resultFilePath)
 
     # act
@@ -30,7 +29,7 @@ def test_serialization_timestamps(timestamps, resultFilePath):
 def test_serialization_instances():
     # arrange
     app = Hlp.createBasicApp([([20, 3, 8], [20, 3, 18])], 'youtube.com', 'opera')
-    di2 = Ao.DetailedInstance('9gag.com', [Hlp.createTimestamp(([20, 5, 0], [20, 5, 30]))])
+    di2 = Hlp.createDetailedInstance([([20, 5, 0], [20, 5, 30])], '9gag.com')
     app.updateOrAddInstance(di2)
     appList = [app]
 
@@ -62,15 +61,15 @@ def test_serialization_apps():
 # Deserialization tests
 #################################################################################################
 
-@pytest.mark.parametrize('inputFilePath, timestamps',
+@pytest.mark.parametrize('inputFilePath, timeDigitsTupList',
                          [
                              ('test_data/t1.json', [([20, 3, 8], [20, 3, 18])]),
                              ('test_data/t2.json', [([20, 3, 8], [20, 3, 18]), ([20, 3, 22], [20, 3, 24])])
 
                          ])
-def test_deserialization_timestamps(inputFilePath, timestamps):
+def test_deserialization_timestamps(inputFilePath, timeDigitsTupList):
     # arrange
-    expectedAppList = [Hlp.createBasicApp(timestamps, 'youtube.com', 'opera')]
+    expectedAppList = [Hlp.createBasicApp(timeDigitsTupList, 'youtube.com', 'opera')]
     appList = []
 
     # act
@@ -84,7 +83,8 @@ def test_deserialization_timestamps(inputFilePath, timestamps):
 def test_deserialization_instances():
     # arrange
     app = Hlp.createBasicApp([([20, 3, 8], [20, 3, 18])], 'youtube.com', 'opera')
-    di2 = Ao.DetailedInstance('9gag.com', [Hlp.createTimestamp(([20, 5, 0], [20, 5, 30]))])
+    di2 = Hlp.createDetailedInstance([([20, 5, 0], [20, 5, 30])], '9gag.com')
+
     app.updateOrAddInstance(di2)
     expectedAppList = [app]
     appList = []

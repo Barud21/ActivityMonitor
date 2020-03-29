@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from typing import List
-import time #just for test
 import datetime
 
 @dataclass
@@ -49,57 +48,14 @@ class ApplicationWithInstances:
                         instance.addTimeStamp(ts)
                     break
 
+    #gets instances from another instance and based on them update this instance
     def updateBasedOnOther(self, other):
         if self.appName == other.appName:
             for i in other.instances:
                 self.updateOrAddInstance(i)
-
-
 
     def sumOfTotalTimeForApplication(self):
         totalTimeForApp = 0
         for instance in self.instances:
             totalTimeForApp += instance.totalTime
         return totalTimeForApp
-
-
-# just for testing new things and playing around
-if __name__ == '__main__':
-
-    start = datetime.datetime.now().time()
-    time.sleep(2)
-    end = datetime.datetime.now().time()
-
-    a = TimeStamp(start, end)
-    detailed = DetailedInstance('9gag.com', [a])
-
-    entireApp = ApplicationWithInstances('Opera', [detailed])
-
-
-    start = datetime.datetime.now().time()
-    time.sleep(2)
-    end = datetime.datetime.now().time()
-    b = TimeStamp(start, end)
-
-    detailed2 = DetailedInstance('youtube.com', [a, b])
-
-    entireApp.updateOrAddInstance(detailed2)
-
-    start = datetime.datetime.now().time()
-    time.sleep(2)
-    end = datetime.datetime.now().time()
-    c = TimeStamp(start, end)
-    detailed3 = DetailedInstance('9gag.com', [c])
-
-    entireApp.updateOrAddInstance(detailed3)
-    print(entireApp)
-
-    detailed4 = DetailedInstance('SwiatMakaronow.com', [a])
-    detailed5 = DetailedInstance('9gag.com', [a])
-    entireApp2 = ApplicationWithInstances('Opera', [detailed4, detailed5])
-
-
-    entireApp2.updateBasedOnOther(entireApp)
-    print(entireApp2)
-
-    print(entireApp.sumOfTotalTimeForApplication())

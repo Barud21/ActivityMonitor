@@ -8,13 +8,17 @@ def createTimestamp(timeDigitsTup):
     return Ao.TimeStamp(t1, t2)
 
 
-def createBasicApp(timeDigitsTupList , InstanceName, AppName):
+def createDetailedInstance(timeDigitsTupList, instanceName):
     timestamps = []
     for tdt in timeDigitsTupList:
         timestamps.append(createTimestamp(tdt))
 
-    detailed = Ao.DetailedInstance(InstanceName, timestamps)
-    return Ao.ApplicationWithInstances(AppName, [detailed])
+    return Ao.DetailedInstance(instanceName, timestamps)
+
+
+def createBasicApp(timeDigitsTupList, instanceName, appName):
+    detailed = createDetailedInstance(timeDigitsTupList, instanceName)
+    return Ao.ApplicationWithInstances(appName, [detailed])
 
 
 def getResultFromFile(filePath):

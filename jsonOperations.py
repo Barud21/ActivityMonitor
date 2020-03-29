@@ -2,7 +2,7 @@ import json
 from _datetime import datetime
 import jsonFormatter as jF
 
-
+# TODO: get  file with the latest date + unit test for that
 def defDecodingJson():
     fileName = datetime.today().strftime('GeneratedFiles/%Y_%m_%d') + ".json"
 
@@ -27,7 +27,7 @@ def defSummingUpTotalTime(applicationList):
 
 # function that calculates percentage time of usage for every application
 def defPercentageCalculation(totalTimeForApplications):
-    percentageUsage = list()
+    percentageUsage = list()    #TODO: Make sure that it does the same as [] and choose the best
     totalUsageTime = 0
 
     for app in totalTimeForApplications:

@@ -19,6 +19,7 @@ window.rowconfigure(1, weight=1)
 label = tk.Label(window, text = "Hello World")
 label.grid(row=0, column=0)
 
+# TODO: Add element to choose a file
 data = jO.defDecodingJson()
 summedTime = jO.defSummingUpTotalTime(data)
 percentageTime = jO.defPercentageCalculation(summedTime)
