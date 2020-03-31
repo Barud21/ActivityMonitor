@@ -19,7 +19,7 @@ import tests.testsHelper as Hlp
 def test_serialization_timestamps(timeDigitsTupList, resultFilePath):
     # arrange
     appList = [Hlp.createBasicApp(timeDigitsTupList, 'youtube.com', 'opera')]
-    expected_result = Hlp.getResultFromFile(resultFilePath)
+    expected_result = Hlp.getResultFromFile(resultFilePath, __file__)
 
     # act
     encodedList = json.dumps(appList, cls=jsonFormatter.CustomJsonEncoder)
@@ -35,7 +35,7 @@ def test_serialization_instances():
     app.updateOrAddInstance(di2)
     appList = [app]
 
-    expected_result = Hlp.getResultFromFile('test_data/t3.json')
+    expected_result = Hlp.getResultFromFile('test_data/t3.json', __file__)
 
     # act
     encodedList = json.dumps(appList, cls=jsonFormatter.CustomJsonEncoder)
@@ -50,7 +50,7 @@ def test_serialization_apps():
     app2 = Hlp.createBasicApp([([20, 7, 10], [20, 7, 30])], 'MyNovelFinalEditLast7.docx', 'word')
     appList = [app, app2]
 
-    expected_result = Hlp.getResultFromFile('test_data/t4.json')
+    expected_result = Hlp.getResultFromFile('test_data/t4.json', __file__)
 
     # act
     encodedList = json.dumps(appList, cls=jsonFormatter.CustomJsonEncoder)
@@ -75,7 +75,7 @@ def test_deserialization_timestamps(inputFilePath, timeDigitsTupList):
     appList = []
 
     # act
-    with open(inputFilePath) as input_file:
+    with open(Hlp.getAbsPath(inputFilePath, __file__)) as input_file:
         appList = json.load(input_file, cls=jsonFormatter.CustomJsonDecoder)
 
     # assert
@@ -92,7 +92,7 @@ def test_deserialization_instances():
     appList = []
 
     # act
-    with open('test_data/t3.json') as input_file:
+    with open(Hlp.getAbsPath('test_data/t3.json', __file__)) as input_file:
         appList = json.load(input_file, cls=jsonFormatter.CustomJsonDecoder)
 
     # assert
@@ -107,7 +107,7 @@ def test_deserialization_apps():
     appList = []
 
     # act
-    with open('test_data/t4.json') as input_file:
+    with open(Hlp.getAbsPath('test_data/t4.json', __file__)) as input_file:
         appList = json.load(input_file, cls=jsonFormatter.CustomJsonDecoder)
 
     # assert

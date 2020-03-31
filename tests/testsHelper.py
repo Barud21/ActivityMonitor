@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import ApplicationObjects as Ao
 
@@ -22,8 +23,13 @@ def createBasicApp(timeDigitsTupList, instanceName, appName):
     return Ao.ApplicationWithInstances(appName, [detailed])
 
 
-def getResultFromFile(filePath):
-    with open(filePath) as result_file:
+def getAbsPath(filename, fileAtr):
+    dirAbsPath = os.path.dirname(os.path.abspath(fileAtr))
+    return os.path.join(dirAbsPath, filename)
+
+
+def getResultFromFile(fileRelativePath, fileAtr):
+    with open(getAbsPath(fileRelativePath, fileAtr)) as result_file:
         return result_file.read()
 
 
