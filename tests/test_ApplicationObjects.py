@@ -1,5 +1,6 @@
-import testsHelper as Hlp
 import pytest
+
+import tests.testsHelper as Hlp
 
 #################################################################################################
 # TimeStamp tests

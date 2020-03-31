@@ -1,7 +1,9 @@
-import jsonFormatter
 import json
-import testsHelper as Hlp  # TODO: Think about this problem with 'No module...' err
+
 import pytest
+
+import jsonFormatter
+import tests.testsHelper as Hlp
 
 
 #################################################################################################
