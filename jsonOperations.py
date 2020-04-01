@@ -4,7 +4,7 @@ import jsonFormatter as jF
 
 # TODO: get  file with the latest date + unit test for that
 def defDecodingJson():
-    fileName = datetime.today().strftime('GeneratedFiles/%Y_%m_%d') + ".json"
+    fileName = datetime.today().strftime('JSON_files/%Y_%m_%d') + ".json"
 
     with open(fileName, 'r') as read_date:                              # opening file with today's date
         jsonData = json.load(read_date, cls=jF.CustomJsonDecoder)       # loading data to memory
@@ -19,9 +19,11 @@ def defSummingUpTotalTime(applicationList):
     for application in applicationList:
         totalTimeForApplications[application.appName] = application.sumOfTotalTimeForApplication()
 
-    print(totalTimeForApplications)
+    #print(totalTimeForApplications)
     totalTimeForApplications = sorted(totalTimeForApplications.items(), key=lambda x: x[1], reverse= True)
-    print(totalTimeForApplications)
+
+    #print(totalTimeForApplications)
+
 
     return totalTimeForApplications
 
@@ -52,4 +54,3 @@ def defSortedInstances(applicationList):
     print(sortedInstances)
 
     return sortedInstances
-

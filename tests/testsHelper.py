@@ -1,8 +1,9 @@
 import datetime
+import json
 import os
 
 import ApplicationObjects as Ao
-
+import jsonFormatter as jF
 
 def createTimestamp(timeDigitsTup):
     t1 = datetime.time(timeDigitsTup[0][0], timeDigitsTup[0][1], timeDigitsTup[0][2])
@@ -35,3 +36,8 @@ def getResultFromFile(fileRelativePath, fileAtr):
 
 def removeWhitespacesFromString(s):
     return ''.join(s.split())
+
+def decodeJson(jsonName):
+    with open(jsonName, 'r') as readData:
+        jsonData = json.load(readData, cls=jF.CustomJsonDecoder)
+    return jsonData
