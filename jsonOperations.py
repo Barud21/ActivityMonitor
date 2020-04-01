@@ -29,7 +29,7 @@ def defSummingUpTotalTime(applicationList):
 
 # function that calculates percentage time of usage for every application
 def defPercentageCalculation(totalTimeForApplications):
-    percentageUsage = list()    #TODO: Make sure that it does the same as [] and choose the best
+    percentageUsage = []
     totalUsageTime = 0
 
     for app in totalTimeForApplications:
@@ -37,6 +37,8 @@ def defPercentageCalculation(totalTimeForApplications):
 
     for app in totalTimeForApplications:
         percentageUsage.append(round(app[1] / totalUsageTime * 100))
+
+    print(percentageUsage)
 
     return percentageUsage
 
@@ -54,3 +56,4 @@ def defSortedInstances(applicationList):
     print(sortedInstances)
 
     return sortedInstances
+

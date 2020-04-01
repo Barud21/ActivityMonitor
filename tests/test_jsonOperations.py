@@ -1,6 +1,6 @@
 import jsonOperations
 import pytest
-import testsHelper as Hlp
+import tests.testsHelper as Hlp
 
 
 #################################################################################################
@@ -39,3 +39,20 @@ def test_SummingUpTotalTime(jsonName, result):
 
     # assert
     assert summedTotalTime == expectedTotalTime
+
+@pytest.mark.parametrize('totalTimeForApplication, result',
+                         [
+                             ([('opera', 10)], [100]),
+                             ([('opera', 40), ('word', 10)], [80, 20]),
+                             ([('opera', 30), ('word', 10)], [75, 25]),
+                             ([('opera', 25), ('word', 15), ('note', 10)], [50, 30, 20])
+                         ])
+def test_PercentageCalculation(totalTimeForApplication, result):
+    # arrange
+    expectedPercentageOfTime = result
+
+    # act
+    PercentageOfUse = jsonOperations.defPercentageCalculation(totalTimeForApplication)
+
+    # assert
+    assert PercentageOfUse == expectedPercentageOfTime
