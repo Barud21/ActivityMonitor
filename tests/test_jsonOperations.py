@@ -19,7 +19,7 @@ import tests.testsHelper as Hlp
 
 
 #################################################################################################
-# Summing up total time tests
+# Summing up total time test
 #################################################################################################
 
 @pytest.mark.parametrize('jsonName, result',
@@ -40,6 +40,10 @@ def test_SummingUpTotalTime(jsonName, result):
     # assert
     assert summedTotalTime == expectedTotalTime
 
+#################################################################################################
+# Calculating pecentage time of use test
+#################################################################################################
+
 @pytest.mark.parametrize('totalTimeForApplication, result',
                          [
                              ([('opera', 10)], [100]),
@@ -56,3 +60,25 @@ def test_PercentageCalculation(totalTimeForApplication, result):
 
     # assert
     assert PercentageOfUse == expectedPercentageOfTime
+
+#################################################################################################
+# Sorting instances test
+#################################################################################################
+
+@pytest.mark.parametrize('jsonName, result',
+                         [
+                             ('test_data/t1.json', {'opera': [('youtube.com', 10)]}),
+                             ('test_data/t2.json', {'opera': [('youtube.com', 12)]}),
+                             ('test_data/t3.json', {'opera': [('9gag.com', 30), ('youtube.com', 10)]}),
+                             ('test_data/t4.json', {'opera': [('youtube.com', 2)], 'word': [('MyNovelFinalEditLast7.docx', 20)]})
+                         ])
+def test_SortedInstances(jsonName, result):
+    # arrange
+    expectedSortedInstances = result
+    applicationList = Hlp.decodeJson(jsonName)
+
+    # act
+    SortedInstances = jsonOperations.defSortedInstances(applicationList)
+
+    # assert
+    assert SortedInstances == expectedSortedInstances

@@ -56,4 +56,3 @@ def defSortedInstances(applicationList):
     print(sortedInstances)
 
     return sortedInstances
-
