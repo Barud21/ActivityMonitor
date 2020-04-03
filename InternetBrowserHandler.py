@@ -20,15 +20,12 @@ class InternetBrowserHandler:
 
     #goes through list of strings, if it finds that some string is an url then returns immediately; otherwise returns empty string
     def __findUrlInStringList (self, potential_urls):
-        urlFound = False
+        found_url = ''
         for maybeUrl in potential_urls:
             result_tuple = self.__isStringAnUrl(maybeUrl)
             if result_tuple[0]:
                 found_url = result_tuple[1]
-                urlFound = True
                 break
-        if not urlFound:
-            found_url = ''
 
         return found_url
 

@@ -24,18 +24,30 @@ def createBasicApp(timeDigitsTupList, instanceName, appName):
     return Ao.ApplicationWithInstances(appName, [detailed])
 
 
+# fileAtr here so we can build an absolute path based on the file when call this function
+# so we can specifiy paths in test file, relatively to the test file itself, for a better readability
 def getAbsPath(filename, fileAtr):
     dirAbsPath = os.path.dirname(os.path.abspath(fileAtr))
     return os.path.join(dirAbsPath, filename)
 
 
-def getResultFromFile(fileRelativePath, fileAtr):
-    with open(getAbsPath(fileRelativePath, fileAtr)) as result_file:
+def getResultFromFileInString(fileRelativePath, fileAtr):
+    with open(getAbsPath(fileRelativePath, fileAtr), encoding='utf8') as result_file:
         return result_file.read()
+
+
+def getJsonObjectsFromFile(filePath, fileAtr):
+    with open(getAbsPath(filePath, fileAtr), 'r',  encoding='utf8') as input_file:
+        return json.load(input_file, cls=jF.CustomJsonDecoder)
+
+
+def dumpObjectsToJsonString(objects):
+    return json.dumps(objects, cls=jF.CustomJsonEncoder, ensure_ascii=False)
 
 
 def removeWhitespacesFromString(s):
     return ''.join(s.split())
+
 
 def decodeJson(jsonName):
     with open(jsonName, 'r') as readData:

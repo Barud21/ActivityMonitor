@@ -76,14 +76,12 @@ class Logger:
 
     #TODO: Make it async (threading) - what about exceptions in thread?
     def _updateFile(self):
-        print('starting file update')
-
         file_name = datetime.datetime.today().strftime('%Y_%m_%d') + ".json"
         file_path = os.path.join(self.filesDirName, file_name)
 
         #open file and read data from it
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r', encoding='utf8') as file:
                 loaded_data = json.load(file, cls=jsonFormatter.CustomJsonDecoder)
         except FileNotFoundError:
             with open(file_path, 'w') as file:
@@ -99,16 +97,14 @@ class Logger:
         self.__updateOtherAplicationsList(new_data)
 
         #serialize new list to json string
-        json_new_data = json.dumps(new_data, cls=jsonFormatter.CustomJsonEncoder)
+        json_new_data = json.dumps(new_data, cls=jsonFormatter.CustomJsonEncoder, ensure_ascii=False)
 
         #save new data to file
-        with open(file_path, 'w') as file:
+        with open(file_path, 'w', encoding='utf8') as file:
             file.write(json_new_data)
 
         #clear self.applications, we dont want to store things we already wrote to file
         self.applications.clear()
-
-        print(new_data)
 
     #main loop, that will periodically scan for an application change and update objects on internal list of applications
     def scan(self):
@@ -123,7 +119,7 @@ class Logger:
                 currentAppName, currentUrl = self.__getCurrentAppNameAndPossibleUrl(win_hndl)
                 # (application changed) OR (the same app but different url) OR (the same app but different window name and no url found)
                 #check for prev_text and prevAppName != '' to prevent from the first empty entry which was always added on startup
-                if ((prevAppName != currentAppName) or \
+                if ((prevAppName != currentAppName) or
                         ((prevAppName == currentAppName) and
                          ((prevUrl != currentUrl) or (currentUrl == prevUrl == '' and prev_text != current_text))))\
                         and (prev_text != '' and prevAppName != ''):
@@ -156,7 +152,8 @@ if __name__ == '__main__':
     littleLoggyOne.scan()
 
 
-
+# TODO: Support for changing date while logging - should write to file 'immediately' and create a new file for current date
+# TODO: Support for windows signals, to not break when system goes to sleep/hybernate. Ideally, write what you already logged, and start working again after is all back again
 
 
 

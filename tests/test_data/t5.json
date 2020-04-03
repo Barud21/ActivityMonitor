@@ -1,0 +1,17 @@
+[
+    {
+        "appName": "TheBestAppEver",
+        "instances": [
+            {
+                "detailedName": "Nice not–ascii containing title  鄭啟源",
+                "timestamps": [
+                    {
+                        "start": "20:05:00",
+                        "end": "20:06:00"
+                    }
+                ],
+                "totalTime": 60
+            }
+        ]
+    }
+]
