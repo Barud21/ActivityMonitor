@@ -74,10 +74,11 @@ class Logger:
                     if nd_app.appName == loggedApp.appName:
                         nd_app.updateBasedOnOther(loggedApp)
 
-    #TODO: Make it async (threading) - what about exceptions in thread?
+    #TODO: Make it async (threading) - what about exceptions in thread? Shared self.applications between the threads?
     def _updateFile(self):
         file_name = datetime.datetime.today().strftime('%Y_%m_%d') + ".json"
         file_path = os.path.join(self.filesDirName, file_name)
+        print('File update in ', file_path)
 
         #open file and read data from it
         try:
@@ -115,6 +116,26 @@ class Logger:
         while True:
             win_hndl = win32gui.GetForegroundWindow()
             current_text = win32gui.GetWindowText(win_hndl)
+
+            shouldWriteNowBecauseOfDayChanging = False
+            thisPointOfDateTime = datetime.datetime.now()
+            if (thisPointOfDateTime + datetime.timedelta(seconds=self.scanningInterval)).day != thisPointOfDateTime.day:
+                shouldWriteNowBecauseOfDayChanging = True
+
+            if shouldWriteNowBecauseOfDayChanging:
+                ending_time = datetime.datetime(thisPointOfDateTime.year, thisPointOfDateTime.month, thisPointOfDateTime.day, 23, 59, 59)
+                self.__updateApplicationsList(prev_text, prevAppName, prevUrl, beginning_time.time(),
+                                              ending_time.time())
+                print(prev_text,
+                      prevAppName,
+                      prevUrl,
+                      beginning_time.time(),
+                      ending_time.time(),
+                      (ending_time - beginning_time).total_seconds()
+                      )
+                beginning_time = ending_time + datetime.timedelta(seconds=1)
+                self._updateFile()
+
             if current_text != prev_text:
                 currentAppName, currentUrl = self.__getCurrentAppNameAndPossibleUrl(win_hndl)
                 # (application changed) OR (the same app but different url) OR (the same app but different window name and no url found)
@@ -131,7 +152,8 @@ class Logger:
                           ending_time.time(),
                           (ending_time - beginning_time).total_seconds()
                           )
-                    self.__updateApplicationsList(prev_text, prevAppName, prevUrl, beginning_time.time(), ending_time.time())
+                    self.__updateApplicationsList(prev_text, prevAppName, prevUrl, beginning_time.time(),
+                                                  ending_time.time())
 
                     beginning_time = datetime.datetime.now()
 
@@ -152,7 +174,6 @@ if __name__ == '__main__':
     littleLoggyOne.scan()
 
 
-# TODO: Support for changing date while logging - should write to file 'immediately' and create a new file for current date
 # TODO: Support for windows signals, to not break when system goes to sleep/hybernate. Ideally, write what you already logged, and start working again after is all back again
 
 
