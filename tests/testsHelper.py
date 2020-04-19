@@ -49,7 +49,6 @@ def removeWhitespacesFromString(s):
     return ''.join(s.split())
 
 
-def decodeJson(jsonName):
-    with open(jsonName, 'r') as readData:
-        jsonData = json.load(readData, cls=jF.CustomJsonDecoder)
-    return jsonData
+def decodeJson(jsonName, fileAtr):
+    with open(getAbsPath(jsonName, fileAtr), 'r', encoding='utf8') as readData:
+        return json.load(readData, cls=jF.CustomJsonDecoder)

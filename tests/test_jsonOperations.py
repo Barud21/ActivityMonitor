@@ -24,15 +24,15 @@ import tests.testsHelper as Hlp
 
 @pytest.mark.parametrize('jsonName, result',
                          [
-                             ('tests/test_data/t1.json', [('opera', 10)]),
-                             ('tests/test_data/t2.json', [('opera', 12)]),
-                             ('tests/test_data/t3.json', [('opera', 40)]),
-                             ('tests/test_data/t4.json', [('word', 20), ('opera', 2)])
+                             ('test_data/t1.json', [('opera', 10)]),
+                             ('test_data/t2.json', [('opera', 12)]),
+                             ('test_data/t3.json', [('opera', 40)]),
+                             ('test_data/t4.json', [('word', 20), ('opera', 2)])
                          ])
 def test_SummingUpTotalTime(jsonName, result):
     # arrange
     expectedTotalTime = result
-    applicationList = Hlp.decodeJson(jsonName)
+    applicationList = Hlp.decodeJson(jsonName, __file__)
 
     # act
     summedTotalTime = jsonOperations.defSummingUpTotalTime(applicationList)
@@ -67,15 +67,15 @@ def test_PercentageCalculation(totalTimeForApplication, result):
 
 @pytest.mark.parametrize('jsonName, result',
                          [
-                             ('tests/test_data/t1.json', {'opera': [('youtube.com', 10)]}),
-                             ('tests/test_data/t2.json', {'opera': [('youtube.com', 12)]}),
-                             ('tests/test_data/t3.json', {'opera': [('9gag.com', 30), ('youtube.com', 10)]}),
-                             ('tests/test_data/t4.json', {'opera': [('youtube.com', 2)], 'word': [('MyNovelFinalEditLast7.docx', 20)]})
+                             ('test_data/t1.json', {'opera': [('youtube.com', 10)]}),
+                             ('test_data/t2.json', {'opera': [('youtube.com', 12)]}),
+                             ('test_data/t3.json', {'opera': [('9gag.com', 30), ('youtube.com', 10)]}),
+                             ('test_data/t4.json', {'opera': [('youtube.com', 2)], 'word': [('MyNovelFinalEditLast7.docx', 20)]})
                          ])
 def test_SortedInstances(jsonName, result):
     # arrange
     expectedSortedInstances = result
-    applicationList = Hlp.decodeJson(jsonName)
+    applicationList = Hlp.decodeJson(jsonName, __file__)
 
     # act
     SortedInstances = jsonOperations.defSortedInstances(applicationList)
