@@ -167,5 +167,17 @@ def test_AWI_updateBasedOnOtherAppDifferentAppName():
     assert len(app2.instances) == 1
     assert len(app2.instances[0].timestamps) == 1
 
+def test_AWI_sumOfTotalTimeForApplication():
+    # arrange
+    timestamp = [([20, 0, 0], [20, 0, 10]), ([19, 0, 0], [19, 0, 10])]
+    app = Hlp.createBasicApp(timestamp, 'youtube.com', 'opera')
 
-# TODO: Bartek: Add test(s) for sumOfTotalTimeForApplication
+    # act
+    calculatedTime = app.sumOfTotalTimeForApplication()
+    expectedTime = 0
+    for tup in timestamp:
+        for number in range(len(tup[0])):
+            expectedTime += tup[1][number] - tup[0][number]
+
+    # assert
+    assert calculatedTime == expectedTime
