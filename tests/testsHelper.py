@@ -47,8 +47,3 @@ def dumpObjectsToJsonString(objects):
 
 def removeWhitespacesFromString(s):
     return ''.join(s.split())
-
-
-def decodeJson(jsonName, fileAtr):
-    with open(getAbsPath(jsonName, fileAtr), 'r', encoding='utf8') as readData:
-        return json.load(readData, cls=jF.CustomJsonDecoder)

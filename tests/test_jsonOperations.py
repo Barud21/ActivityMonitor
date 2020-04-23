@@ -32,7 +32,7 @@ import tests.testsHelper as Hlp
 def test_SummingUpTotalTime(jsonName, result):
     # arrange
     expectedTotalTime = result
-    applicationList = Hlp.decodeJson(jsonName, __file__)
+    applicationList = Hlp.getJsonObjectsFromFile(jsonName, __file__)
 
     # act
     summedTotalTime = jsonOperations.defSummingUpTotalTime(applicationList)
@@ -75,7 +75,7 @@ def test_PercentageCalculation(totalTimeForApplication, result):
 def test_SortedInstances(jsonName, result):
     # arrange
     expectedSortedInstances = result
-    applicationList = Hlp.decodeJson(jsonName, __file__)
+    applicationList = Hlp.getJsonObjectsFromFile(jsonName, __file__)
 
     # act
     SortedInstances = jsonOperations.defSortedInstances(applicationList)
