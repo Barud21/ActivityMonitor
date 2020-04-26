@@ -23,7 +23,7 @@ class Logger:
         if not os.path.isdir(self.filesDirName):
             os.mkdir(self.filesDirName)
 
-    #gets process name for a given windows handle
+    # gets process name for a given windows handle
     def __getAppNameFromHndl (self, win_hndl):
         pid = win32process.GetWindowThreadProcessId(win_hndl)
 
@@ -33,7 +33,7 @@ class Logger:
             appName = ''
         return appName
 
-    #returns both app name and url
+    # returns both app name and url
     def __getCurrentAppNameAndPossibleUrl (self, win_hndl):
         appName = self.__getAppNameFromHndl(win_hndl)
         appName = appName.lower().replace('.exe', '')
@@ -41,7 +41,7 @@ class Logger:
 
         return appName, url
 
-    #space saving method, for easier creation of DetailedInstance object
+    # space saving method, for easier creation of DetailedInstance object
     def __createTempDetailedInstance(self, windowName, url, startTime, endTime):
         timestamp = Ao.TimeStamp(startTime, endTime)
         if url != '':
@@ -50,7 +50,7 @@ class Logger:
             detailedName = windowName
         return Ao.DetailedInstance(detailedName, [timestamp])
 
-    #adds a new application if not logged before or updates the existing one
+    # adds a new application if not logged before or updates the existing one
     def __updateApplicationsList(self, windowName, appName, url, startTime, endTime):
 
         detailedInst = self.__createTempDetailedInstance(windowName, url, startTime, endTime)
@@ -64,7 +64,7 @@ class Logger:
                     application.updateOrAddInstance(detailedInst)
                     break
 
-     #takes other application list and extends it (only addition is done) based on the self.applications
+     # takes other application list and extends it (only addition is done) based on the self.applications
     def __updateOtherAplicationsList(self, other):
         for loggedApp in self.applications:
             if loggedApp.appName not in [x.appName for x in other]:         #add new ApplicationWithInstances
@@ -74,40 +74,44 @@ class Logger:
                     if nd_app.appName == loggedApp.appName:
                         nd_app.updateBasedOnOther(loggedApp)
 
-    #TODO: Make it async (threading) - what about exceptions in thread? Shared self.applications between the threads?
+    # TODO: Make it async (threading) - what about exceptions in thread? Shared self.applications between the threads?
     def _updateFile(self):
         file_name = datetime.datetime.today().strftime('%Y_%m_%d') + ".json"
         file_path = os.path.join(self.filesDirName, file_name)
         print('File update in ', file_path)
 
-        #open file and read data from it
+        # open file and read data from it
         try:
             with open(file_path, 'r', encoding='utf8') as file:
+                loaded_raw_text = file.read()
+                file.seek(0)
                 loaded_data = json.load(file, cls=jsonFormatter.CustomJsonDecoder)
         except FileNotFoundError:
             with open(file_path, 'w') as file:
-                pass    #just create an empty file
+                pass    # just create an empty file
             loaded_data = []
         except json.decoder.JSONDecodeError:
-            #TODO: do we really want to exit now?
-            print('File is corrupted, exiting ;(')
-            exit()
+            if loaded_raw_text:
+                print('File is corrupted, exiting ;(')
+                exit()
+            else:
+                loaded_data = []
 
-        #create new application list, update loaded data with self.applications
+        # create new application list, update loaded data with self.applications
         new_data = loaded_data
         self.__updateOtherAplicationsList(new_data)
 
-        #serialize new list to json string
+        # serialize new list to json string
         json_new_data = json.dumps(new_data, cls=jsonFormatter.CustomJsonEncoder, ensure_ascii=False)
 
-        #save new data to file
+        # save new data to file
         with open(file_path, 'w', encoding='utf8') as file:
             file.write(json_new_data)
 
-        #clear self.applications, we dont want to store things we already wrote to file
+        # clear self.applications, we dont want to store things we already wrote to file
         self.applications.clear()
 
-    #main loop, that will periodically scan for an application change and update objects on internal list of applications
+    # main loop, that will periodically scan for an application change and update objects on internal list of applications
     def scan(self):
         prev_text, prevAppName, prevUrl = '', '', ''
         beginning_time = datetime.datetime.now()
@@ -139,7 +143,7 @@ class Logger:
             if current_text != prev_text:
                 currentAppName, currentUrl = self.__getCurrentAppNameAndPossibleUrl(win_hndl)
                 # (application changed) OR (the same app but different url) OR (the same app but different window name and no url found)
-                #check for prev_text and prevAppName != '' to prevent from the first empty entry which was always added on startup
+                # check for prev_text and prevAppName != '' to prevent from the first empty entry which was always added on startup
                 if ((prevAppName != currentAppName) or
                         ((prevAppName == currentAppName) and
                          ((prevUrl != currentUrl) or (currentUrl == prevUrl == '' and prev_text != current_text))))\
@@ -175,6 +179,7 @@ if __name__ == '__main__':
 
 
 # TODO: Support for windows signals, to not break when system goes to sleep/hybernate. Ideally, write what you already logged, and start working again after is all back again
-
+# TODO: Support for having focus on windows desktop (for now we add this time to the previous application which is not right)
+# ^ It seems that clicking on dektop manually works as expected, but using shortcut Win + D doesnt set focus on desktop by default, hence we log this time as the previously open application
 
 
