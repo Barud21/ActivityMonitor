@@ -37,7 +37,23 @@ canvas = FigureCanvasTkAgg(fig, master=window)
 canvas.get_tk_widget().grid(row=1, column=0, sticky='nsew')
 canvas.draw()
 
+instancesList = tk.Listbox(window)
+instancesList.grid(row=1, column=3, sticky='nsew')
+instancesList.config(border=2, relief='sunken')
+
+def CurSelect(evt):
+    value = str((applicationList.get(applicationList.curselection())))
+    value = value[:-11]
+
+    for key in sortedInstances.keys():
+        if key == value:
+            instancesList.delete(0,'end')
+            for x in range(len(sortedInstances[key])):
+                instancesList.insert(tk.END, sortedInstances[key][x][0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(sortedInstances[key][x][1])))
+
+
 applicationList = tk.Listbox(window)
+applicationList.bind('<<ListboxSelect>>', CurSelect)
 applicationList.grid(row=1, column=1, sticky='nsew')
 applicationList.config(border=2, relief='sunken')
 for zone in summedTime:
@@ -50,13 +66,6 @@ applicationList['yscrollcommand'] = applicationScrollVertical.set
 applicationScrollHorizontal = tk.Scrollbar(window, orient=tk.HORIZONTAL, command=applicationList.xview)
 applicationScrollHorizontal.grid(row=2, column=1, sticky='sew')
 applicationList['xscrollcommand'] = applicationScrollHorizontal.set
-
-instancesList = tk.Listbox(window)
-instancesList.grid(row=1, column=3, sticky='nsew')
-instancesList.config(border=2, relief='sunken')
-for key in sortedInstances.keys():
-    for x in range(len(sortedInstances[key])):
-        instancesList.insert(tk.END, sortedInstances[key][x][0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(sortedInstances[key][x][1])))
 
 instancesScrollVertical = tk.Scrollbar(window, orient=tk.VERTICAL, command=instancesList.yview)
 instancesScrollVertical.grid(row=1, column=4, sticky='nsw')
