@@ -6,6 +6,7 @@ import time
 import jsonOperations as jO
 
 window = tk.Tk()
+window.minsize(600, 600)
 window.title('Activity Monitor')
 
 window.columnconfigure(0, weight=10000)
