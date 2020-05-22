@@ -2,7 +2,9 @@ import tkinter as tk
 import matplotlib.figure
 import matplotlib.patches
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkinter import *
 import time
+import os
 import jsonOperations as jO
 
 window = tk.Tk()
@@ -16,17 +18,33 @@ window.columnconfigure(3, weight=10000)
 window.columnconfigure(4, weight=1)
 window.rowconfigure(0, weight=1)
 window.rowconfigure(1, weight=1000000)
-window.rowconfigure(1, weight=1)
-label = tk.Label(window, text = "Hello World")
-label.grid(row=0, column=0)
+window.rowconfigure(2, weight=1)
+
+# label = tk.Label(window, text = "Hello World")
+# label.grid(row=0, column=0)
 
 # TODO: Add element to choose a file
-data = jO.defDecodingJson()
+data = jO.defDecodingJson()[0]
+listOfDates = jO.defDecodingJson()[1]
 summedTime = jO.defSummingUpTotalTime(data)
 percentageTime = jO.defPercentageCalculation(summedTime)
 sortedInstances = jO.defSortedInstances(data)
 
-house_prices = percentageTime
+i = 0
+for item in listOfDates:
+    item = item[-15:-5].replace("_", "/")
+    listOfDates[i] = item
+    i += 1
+
+default = max(listOfDates)
+defaultDate = StringVar(window)
+defaultDate.set(default)
+
+
+datesMenu = OptionMenu(window, defaultDate, *listOfDates)
+datesMenu.grid(row=0, column=0)
+
+# house_prices = percentageTime
 
 fig = matplotlib.figure.Figure(figsize=(5,5))
 ax = fig.add_subplot(111)
