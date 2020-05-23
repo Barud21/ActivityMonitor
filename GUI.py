@@ -4,7 +4,6 @@ import matplotlib.patches
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import *
 import time
-import os
 import jsonOperations as jO
 
 window = tk.Tk()
@@ -24,27 +23,36 @@ window.rowconfigure(2, weight=1)
 # label.grid(row=0, column=0)
 
 # TODO: Add element to choose a file
-data = jO.defDecodingJson()[0]
-listOfDates = jO.defDecodingJson()[1]
+listOfFiles = jO.defListOfFiles()
+latestFile = jO.defFindingLatestFile(listOfFiles)
+data = jO.defDecodingJson(latestFile[1])
 summedTime = jO.defSummingUpTotalTime(data)
 percentageTime = jO.defPercentageCalculation(summedTime)
 sortedInstances = jO.defSortedInstances(data)
 
-i = 0
-for item in listOfDates:
-    item = item[-15:-5].replace("_", "/")
-    listOfDates[i] = item
-    i += 1
-
-default = max(listOfDates)
+default = latestFile[0]
 defaultDate = StringVar(window)
 defaultDate.set(default)
 
 
-datesMenu = OptionMenu(window, defaultDate, *listOfDates)
+def DateSelect(value):
+    #value = value.replace("/", "_")
+    print(value)
+    for k in listOfFiles.keys():
+        if k == value:
+            applicationList.delete(0, 'end')
+            instancesList.delete(0,'end')
+            data = jO.defDecodingJson(listOfFiles[k])
+            summedTime = jO.defSummingUpTotalTime(data)
+            percentageTime = jO.defPercentageCalculation(summedTime)
+            sortedInstances = jO.defSortedInstances(data)
+            for zone in summedTime:
+                applicationList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
+
+
+datesMenu = tk.OptionMenu(window, defaultDate, *listOfFiles.keys(), command=DateSelect)
 datesMenu.grid(row=0, column=0)
 
-# house_prices = percentageTime
 
 fig = matplotlib.figure.Figure(figsize=(5,5))
 ax = fig.add_subplot(111)
@@ -59,7 +67,8 @@ instancesList = tk.Listbox(window)
 instancesList.grid(row=1, column=3, sticky='nsew')
 instancesList.config(border=2, relief='sunken')
 
-def CurSelect(evt):
+
+def AppSelect(evt):
     value = str((applicationList.get(applicationList.curselection())))
     value = value[:-11]
 
@@ -71,7 +80,7 @@ def CurSelect(evt):
 
 
 applicationList = tk.Listbox(window)
-applicationList.bind('<<ListboxSelect>>', CurSelect)
+applicationList.bind('<<ListboxSelect>>', AppSelect)
 applicationList.grid(row=1, column=1, sticky='nsew')
 applicationList.config(border=2, relief='sunken')
 for zone in summedTime:

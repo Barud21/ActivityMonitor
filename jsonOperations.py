@@ -5,17 +5,30 @@ from _datetime import datetime
 import jsonFormatter as jF
 
 
+def defListOfFiles():
+    listOfFiles = glob.glob('C:/Users/Bartek/Documents/_Projekty/Python/Pycharm_projects/ActivityMonitor/GeneratedFiles/*')
+    dictOfFiles = {}
+
+    for file in listOfFiles:
+        key = file[-15:-5].replace("_", "/")
+        dictOfFiles[key] = file
+
+    return dictOfFiles
+
+
+def defFindingLatestFile(dictionary):
+    latestFile = list(dictionary.values())[-1]
+    latestDate = list(dictionary.keys())[-1]
+
+    return latestDate, latestFile
+
+
 # TODO: unit test for that
-def defDecodingJson(fileName = None):
-    list_of_files = glob.glob('C:/Users/Bartek/Documents/_Projekty/Python/Pycharm_projects/ActivityMonitor/GeneratedFiles/*')
-
-    if fileName == None:
-         fileName = max(list_of_files, key=os.path.getctime)
-
+def defDecodingJson(fileName):
     with open(fileName, 'r') as read_date:                              # opening the latest file in directory
         jsonData = json.load(read_date, cls=jF.CustomJsonDecoder)       # loading data to memory
 
-    return jsonData, list_of_files
+    return jsonData
 
 
 # function that sums up total usage time for every applications and sorts application in descending order by total usage time
