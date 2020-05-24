@@ -6,6 +6,10 @@ env
 .pytest_cache
 .coverage
 
+#From PyInstaller
+*.spec
+/dist
+/build
 
 # Created by https://www.gitignore.io/api/pycharm+all
 # Edit at https://www.gitignore.io/?templates=pycharm+all

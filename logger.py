@@ -179,6 +179,7 @@ if __name__ == '__main__':
 
 
 # TODO: Support for windows signals, to not break when system goes to sleep/hybernate. Ideally, write what you already logged, and start working again after is all back again
+# ^ Works well if sleep time is relatively small (like 5mins), when it was around 40 mins it stopped working (needs more investigation)
 # TODO: Support for having focus on windows desktop (for now we add this time to the previous application which is not right)
 # ^ It seems that clicking on dektop manually works as expected, but using shortcut Win + D doesnt set focus on desktop by default, hence we log this time as the previously open application
 
