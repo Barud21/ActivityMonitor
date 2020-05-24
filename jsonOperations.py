@@ -6,7 +6,9 @@ import jsonFormatter as jF
 
 
 def defListOfFiles():
-    listOfFiles = glob.glob('C:/Users/Bartek/Documents/_Projekty/Python/Pycharm_projects/ActivityMonitor/GeneratedFiles/*')
+    projectRoot = os.path.dirname(os.path.abspath(__file__))
+    projectRoot = os.path.join(projectRoot, 'GeneratedFiles\*')
+    listOfFiles = glob.glob(projectRoot)
     dictOfFiles = {}
 
     for file in listOfFiles:

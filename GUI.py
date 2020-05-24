@@ -49,6 +49,10 @@ def DateSelect(value):
             for zone in summedTime:
                 applicationList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
 
+            ax.clear()
+            ax.pie(percentageTime, labels=[x[0] for x in summedTime], autopct='%1.1f%%', explode=[0.01 for x in summedTime])
+            canvas.draw()
+
 
 datesMenu = tk.OptionMenu(window, defaultDate, *listOfFiles.keys(), command=DateSelect)
 datesMenu.grid(row=0, column=0)
@@ -56,8 +60,8 @@ datesMenu.grid(row=0, column=0)
 
 fig = matplotlib.figure.Figure(figsize=(5,5))
 ax = fig.add_subplot(111)
-ax.pie(percentageTime)
-ax.legend([x[0] for x in summedTime]) # summedTime[0][0]
+ax.pie(percentageTime, labels=[x[0] for x in summedTime], autopct='%1.1f%%', explode=[0.01 for x in summedTime])
+# ax.legend([x[0] for x in summedTime]) # summedTime[0][0]
 
 canvas = FigureCanvasTkAgg(fig, master=window)
 canvas.get_tk_widget().grid(row=1, column=0, sticky='nsew')
