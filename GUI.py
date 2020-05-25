@@ -18,11 +18,10 @@ window.columnconfigure(4, weight=1)
 window.rowconfigure(0, weight=1)
 window.rowconfigure(1, weight=1000000)
 window.rowconfigure(2, weight=1)
+window.rowconfigure(3, weight=1)
+window.rowconfigure(3, weight=1)
 
-# label = tk.Label(window, text = "Hello World")
-# label.grid(row=0, column=0)
 
-# TODO: Add element to choose a file
 listOfFiles = jO.defListOfFiles()
 latestFile = jO.defFindingLatestFile(listOfFiles)
 data = jO.defDecodingJson(latestFile[1])
@@ -36,40 +35,47 @@ defaultDate.set(default)
 
 
 def DateSelect(value):
-    #value = value.replace("/", "_")
-    print(value)
     for k in listOfFiles.keys():
         if k == value:
             applicationList.delete(0, 'end')
             instancesList.delete(0,'end')
+            global data, summedTime, percentageTime, sortedInstances
             data = jO.defDecodingJson(listOfFiles[k])
             summedTime = jO.defSummingUpTotalTime(data)
             percentageTime = jO.defPercentageCalculation(summedTime)
             sortedInstances = jO.defSortedInstances(data)
             for zone in summedTime:
                 applicationList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
-
-            ax.clear()
-            ax.pie(percentageTime, labels=[x[0] for x in summedTime], autopct='%1.1f%%', explode=[0.01 for x in summedTime])
-            canvas.draw()
+            defDrawingPie(percentage=percentageTime, totalTime=summedTime)
 
 
 datesMenu = tk.OptionMenu(window, defaultDate, *listOfFiles.keys(), command=DateSelect)
 datesMenu.grid(row=0, column=0)
 
 
-fig = matplotlib.figure.Figure(figsize=(5,5))
-ax = fig.add_subplot(111)
-ax.pie(percentageTime, labels=[x[0] for x in summedTime], autopct='%1.1f%%', explode=[0.01 for x in summedTime])
-# ax.legend([x[0] for x in summedTime]) # summedTime[0][0]
+def defDrawingPie(percentage=percentageTime, totalTime=summedTime):
+    fig = matplotlib.figure.Figure(figsize=(5,5))
+    ax = fig.add_subplot(111)
+    #ax.clear
+    ax.pie(percentage, labels=[x[0] for x in totalTime], autopct='%1.1f%%', explode=[0.01 for x in totalTime])
+    canvas = FigureCanvasTkAgg(fig, master=window)
+    canvas.get_tk_widget().grid(row=1, column=0, sticky='nsew')
+    canvas.draw()
 
-canvas = FigureCanvasTkAgg(fig, master=window)
-canvas.get_tk_widget().grid(row=1, column=0, sticky='nsew')
-canvas.draw()
+
+defDrawingPie()
 
 instancesList = tk.Listbox(window)
 instancesList.grid(row=1, column=3, sticky='nsew')
 instancesList.config(border=2, relief='sunken')
+
+instancesScrollVertical = tk.Scrollbar(window, orient=tk.VERTICAL, command=instancesList.yview)
+instancesScrollVertical.grid(row=1, column=4, sticky='nsw')
+instancesList['yscrollcommand'] = instancesScrollVertical.set
+
+instancesScrollHorizontal = tk.Scrollbar(window, orient=tk.HORIZONTAL, command=instancesList.xview)
+instancesScrollHorizontal.grid(row=2, column=3, sticky='sew')
+instancesList['xscrollcommand'] = instancesScrollHorizontal.set
 
 
 def AppSelect(evt):
@@ -97,13 +103,5 @@ applicationList['yscrollcommand'] = applicationScrollVertical.set
 applicationScrollHorizontal = tk.Scrollbar(window, orient=tk.HORIZONTAL, command=applicationList.xview)
 applicationScrollHorizontal.grid(row=2, column=1, sticky='sew')
 applicationList['xscrollcommand'] = applicationScrollHorizontal.set
-
-instancesScrollVertical = tk.Scrollbar(window, orient=tk.VERTICAL, command=instancesList.yview)
-instancesScrollVertical.grid(row=1, column=4, sticky='nsw')
-instancesList['yscrollcommand'] = instancesScrollVertical.set
-
-instancesScrollHorizontal = tk.Scrollbar(window, orient=tk.HORIZONTAL, command=instancesList.xview)
-instancesScrollHorizontal.grid(row=2, column=3, sticky='sew')
-instancesList['xscrollcommand'] = instancesScrollHorizontal.set
 
 window.mainloop()
