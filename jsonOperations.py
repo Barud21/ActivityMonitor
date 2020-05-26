@@ -1,7 +1,6 @@
 import json
 import glob
 import os
-from _datetime import datetime
 import jsonFormatter as jF
 
 
