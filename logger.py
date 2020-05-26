@@ -1,27 +1,28 @@
 import win32gui, win32process
 import psutil
-
 import datetime
 import time
+import os
+import json
+import logging
 
 from InternetBrowserHandler import InternetBrowserHandler
 import ApplicationObjects as Ao
-
-import os
-import json
 import jsonFormatter
 
 
 class Logger:
     def __init__(self):
-        self.scanningInterval = 5  # seconds
-        self.fileWritingInterval = 30  # seconds
+        self.scanningInterval = 30  # seconds
+        self.fileWritingInterval = 300  # seconds
         self.filesDirName = 'GeneratedFiles'
         self.InternetBrowser = InternetBrowserHandler()
         self.applications = []
 
         if not os.path.isdir(self.filesDirName):
             os.mkdir(self.filesDirName)
+
+        logging.basicConfig(filename='app.log', format='%(asctime)s - %(levelname)s - %(message)s')
 
     # gets process name for a given windows handle
     def __getAppNameFromHndl (self, win_hndl):
@@ -92,8 +93,9 @@ class Logger:
             loaded_data = []
         except json.decoder.JSONDecodeError:
             if loaded_raw_text:
-                print('File is corrupted, exiting ;(')
-                exit()
+                logging.exception('File is corrupted, exiting ;(')
+                # exit()
+                raise
             else:
                 loaded_data = []
 
@@ -175,8 +177,12 @@ class Logger:
 
 if __name__ == '__main__':
     littleLoggyOne = Logger()
-    littleLoggyOne.scan()
 
+    try:
+        littleLoggyOne.scan()
+    except Exception as e:
+        logging.exception(f'Exception occurred. Dump of currently stored applications list which was not saved to file yet: {littleLoggyOne.applications}')
+        raise
 
 # TODO: Support for windows signals, to not break when system goes to sleep/hybernate. Ideally, write what you already logged, and start working again after is all back again
 # ^ Works well if sleep time is relatively small (like 5mins), when it was around 40 mins it stopped working (needs more investigation)

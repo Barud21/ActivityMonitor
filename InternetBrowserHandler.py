@@ -1,7 +1,6 @@
 import re
-import time
 
-from pywinauto import Application
+from pywinauto import Application, uia_defines
 
 
 
@@ -15,9 +14,13 @@ class InternetBrowserHandler:
             for d in dialog.descendants():
                 control_type = d._BaseWrapper__repr_texts()[2]
                 if control_type == 'Edit':  # in one of these fields, url is hidden (tested only for chromium)
-                    control_text = d.get_value()
-                    if control_text != '':
-                        potential_urls.append(control_text)
+                    try:
+                        control_text = d.get_value()
+                    except uia_defines.NoPatternInterfaceError:
+                        control_text = ''
+                    finally:
+                        if control_text != '':
+                            potential_urls.append(control_text)
 
         return potential_urls
 
@@ -53,7 +56,7 @@ class InternetBrowserHandler:
 
         try:
             app.connect(handle=win_hndl)
-            dlgs = app.windows()    # for some reason when we fetch the list of opens windows for a given app, urls seems to be fetched always correctly, when we use app.top_window() sometimes url element is empty
+            dlgs = app.windows()    # for some reason when we fetch the list of opens windows for a given app, urls seems to be fetched 'always' correctly, when we use app.top_window() sometimes url element is empty
                                     # when we handle list of windows; then top window is always first on the list; and during checking url validation whe always stop after getting the first url
                                     # hacky, but seems to work now
         except RuntimeError:

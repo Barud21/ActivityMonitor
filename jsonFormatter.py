@@ -1,7 +1,7 @@
-import ApplicationObjects as Ao
 import json
 import datetime
 
+import ApplicationObjects as Ao
 
 # Allows to specify how object of our custom classes should be represented as json
 class CustomJsonEncoder(json.JSONEncoder):

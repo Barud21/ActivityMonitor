@@ -40,3 +40,14 @@ Steps required to generate exec files:
 * pyinstaller.exe .\logger.py --onefile --exclude-module=pytest -w  
 
 Then logger.exe and GUI.exe files will be created in _dist_ directory.
+
+## How to add a logger module to Windows autostart?
+1. Create a shortcut to logger.exe
+2. Open Autostart Windows directory:  
+ 2.1  Win + R  
+ 2.2 Type "shell:startup"
+3. Put logger shortcut into Autostart Windows directory
+
+## Known problems  
+1. _Sometimes_ fetching an url of open website doesn't work correctly. In such case, name of the window is logged instead.
+It is either related to browser magic or pywinauto module. I couldn't find a way to reproduce it on demand. Maybe You can help?  
