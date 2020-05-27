@@ -5,9 +5,7 @@ import jsonFormatter as jF
 
 
 def defListOfFiles():
-    projectRoot = os.path.dirname(os.path.abspath(__file__))
-    projectRoot = os.path.join(projectRoot, 'GeneratedFiles\*')
-    listOfFiles = glob.glob(projectRoot)
+    listOfFiles = glob.glob(os.path.join(os.getcwd(), 'GeneratedFiles\*'))
     dictOfFiles = {}
 
     for file in listOfFiles:
