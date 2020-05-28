@@ -18,11 +18,33 @@ class Logger:
         self.filesDirName = 'GeneratedFiles'
         self.InternetBrowser = InternetBrowserHandler()
         self.applications = []
+        self.prevDebugInfo = {}
+        self.curDebugInfo = {}
+
+        self.__setupDebugDicts()
+        logging.basicConfig(filename='app.log', format='%(asctime)s - %(levelname)s - %(message)s')
 
         if not os.path.isdir(self.filesDirName):
             os.mkdir(self.filesDirName)
 
-        logging.basicConfig(filename='app.log', format='%(asctime)s - %(levelname)s - %(message)s')
+    def __setupDebugDicts(self):
+        keys = ["Text", "AppName", "Url"]
+        for k in keys:
+            self.prevDebugInfo[k] = ''
+            self.curDebugInfo[k] = ''
+
+    def _setDebugInfo(self, debugListType, text, appName, url):
+        usedDict = {}
+        if debugListType.lower() == "prev":
+            usedDict = self.prevDebugInfo
+        elif debugListType.lower() == "cur":
+            usedDict = self.curDebugInfo
+        else:
+            raise NotImplementedError
+
+        usedDict["Text"] = text
+        usedDict["AppName"] = appName
+        usedDict["Url"] = url
 
     # gets process name for a given windows handle
     def __getAppNameFromHndl (self, win_hndl):
@@ -139,6 +161,7 @@ class Logger:
                       ending_time.time(),
                       (ending_time - beginning_time).total_seconds()
                       )
+                self._setDebugInfo("prev", prev_text, prevAppName, prevUrl)
                 beginning_time = ending_time + datetime.timedelta(seconds=1)
                 self._updateFile()
 
@@ -158,6 +181,9 @@ class Logger:
                           ending_time.time(),
                           (ending_time - beginning_time).total_seconds()
                           )
+                    self._setDebugInfo("prev", prev_text, prevAppName, prevUrl)
+                    self._setDebugInfo("cur", current_text, currentAppName, currentUrl)
+
                     self.__updateApplicationsList(prev_text, prevAppName, prevUrl, beginning_time.time(),
                                                   ending_time.time())
 
@@ -181,7 +207,9 @@ if __name__ == '__main__':
     try:
         littleLoggyOne.scan()
     except Exception as e:
-        logging.exception(f'Exception occurred. Dump of currently stored applications list which was not saved to file yet: {littleLoggyOne.applications}')
+        logging.exception(f'Exception occurred. Dump of currently stored applications list which was not saved to file yet: {littleLoggyOne.applications} '
+                          f'Previous application: {littleLoggyOne.prevDebugInfo}'
+                          f'Current application: {littleLoggyOne.curDebugInfo}')
         raise
 
 # TODO: Support for windows signals, to not break when system goes to sleep/hybernate. Ideally, write what you already logged, and start working again after is all back again
