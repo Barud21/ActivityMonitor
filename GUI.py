@@ -6,143 +6,182 @@ from tkinter import *
 import time
 import jsonOperations as jO
 
-window = tk.Tk()
-window.minsize(900, 700)
-window.title('Activity Monitor')
 
-window.columnconfigure(0, weight=5000)
-window.columnconfigure(1, weight=5000)
-window.rowconfigure(0, weight=50)
-window.rowconfigure(1, weight=5000)
-window.rowconfigure(2, weight=5000)
+class MainApplication:
+    listOfFiles = jO.defListOfFiles()
+    latestFile = jO.defFindingLatestFile(listOfFiles)
+    data = jO.defDecodingJson(latestFile[1])
+    summedTime = jO.defSummingUpTotalTime(data)
+    percentageTime = jO.defPercentageCalculation(summedTime)
+    sortedInstances = jO.defSortedInstances(data)
+    selectedApp = None
 
-# title frame declaration
-titleFrame = Frame(window)
-titleFrame.grid(row=0, column=0, columnspan=2, sticky='nsew')
-titleFrame.config(border=10)
-titleFrame.columnconfigure(0, weight=10)
-titleFrame.rowconfigure(0, weight=10)
-titleLabel = Label(titleFrame, text="Monitor aktywności - używasz na własną odpowiedzialność ;)")
-titleLabel.grid(row=0, column=0, sticky='nsew')
-titleLabel.config(font=14)
+    def __init__(self, master, *args, **kwargs):
+        #tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.master = master
 
-# pie chart frame declaration
-pieFrame = Frame(window)
-pieFrame.grid(row=1, column=0, rowspan=2, sticky='nsew')
-pieFrame.config(border=5)
-pieFrame.columnconfigure(0, weight=10)
-pieFrame.columnconfigure(1, weight=10)
-pieFrame.rowconfigure(0, weight=1)
-pieFrame.rowconfigure(1, weight=10)
+        master.title("Activity Monitor")
+        master.minsize(1000, 800)
+        master.columnconfigure(0, weight=5000)
+        master.columnconfigure(1, weight=1000)
+        master.rowconfigure(0, weight=50)
+        master.rowconfigure(1, weight=5000)
+        master.rowconfigure(2, weight=5000)
 
-# applications frame declaration
-appsFrame = Frame(window)
-appsFrame.grid(row=1, column=1, sticky='nsew')
-appsFrame.config(border=2)
-appsFrame.columnconfigure(0, weight=10)
-appsFrame.columnconfigure(1, weight=1)
-appsFrame.rowconfigure(0, weight=10)
-appsFrame.rowconfigure(1, weight=1)
+        self.titleFrame = Frame(master)
+        self.pieFrame = Frame(master)
+        self.appsFrame = LabelFrame(master, text="Lista aplikacji", font=("Purisa", 11))
+        self.applicationsList = tk.Listbox(self.appsFrame)
+        self.instancesFrame = LabelFrame(master, text="Lista instancji", font=("Purisa", 11))
 
-# instances frame declaration
-instancesFrame = Frame(window)
-instancesFrame.grid(row=2, column=1, sticky='nsew')
-instancesFrame.config(border=2)
-instancesFrame.columnconfigure(0, weight=10)
-instancesFrame.columnconfigure(1, weight=1)
-instancesFrame.rowconfigure(0, weight=10)
-instancesFrame.rowconfigure(1, weight=1)
+        self.defaultFile = self.latestFile[0]
+        self.defaultDate = StringVar(self.pieFrame)
+        self.defaultDate.set(self.defaultFile)
 
-# declaration of global variables
-listOfFiles = jO.defListOfFiles()
-latestFile = jO.defFindingLatestFile(listOfFiles)
-data = jO.defDecodingJson(latestFile[1])
-summedTime = jO.defSummingUpTotalTime(data)
-percentageTime = jO.defPercentageCalculation(summedTime)
-sortedInstances = jO.defSortedInstances(data)
+        self.titleFrameDeclaration()
+        self.pieFrameDeclaration()
+        self.appsFrameDeclaration()
+        self.instancesFrameDeclaration()
+        self.drawingPieChart()
+        self.updateData()
 
-# declaration of default data file
-defaultFile = latestFile[0]
-defaultDate = StringVar(pieFrame)
-defaultDate.set(defaultFile)
+    def titleFrameDeclaration(self):
+        self.titleFrame.grid(row=0, column=0, columnspan=2, sticky='nsew')
+        self.titleFrame.config(border=10)
+        self.titleFrame.columnconfigure(0, weight=10)
+        self.titleFrame.rowconfigure(0, weight=10)
+        self.titleLabel = Label(self.titleFrame, text="Monitor aktywności - używasz na własną odpowiedzialność ;)")
+        self.titleLabel.grid(row=0, column=0, sticky='nsew')
+        self.titleLabel.config(font=("Purisa", 14))
+
+    def pieFrameDeclaration(self):
+        self.pieFrame.grid(row=1, column=0, rowspan=2, sticky='nsew')
+        self.pieFrame.config(border=5)
+        self.pieFrame.columnconfigure(0, weight=10)
+        self.pieFrame.columnconfigure(1, weight=10)
+        self.pieFrame.rowconfigure(0, weight=1)
+        self.pieFrame.rowconfigure(1, weight=10)
+
+        self.datesMenuLabel = Label(self.pieFrame, text="Data: ")
+        self.datesMenuLabel.grid(row=0, column=0, sticky='e')
+        self.datesMenuLabel.config(font=("Purisa", 12))
+        self.datesMenu = tk.OptionMenu(self.pieFrame, self.defaultDate, *self.listOfFiles.keys(), command=self.dateSelection)
+        self.datesMenu.grid(row=0, column=1, sticky='w')
+        self.datesMenu.config(font=("Purisa", 12))
+
+    def appsFrameDeclaration(self):
+        self.appsFrame.grid(row=1, column=1, sticky='nsew')
+        self.appsFrame.config(border=5)
+        self.appsFrame.columnconfigure(0, weight=100)
+        self.appsFrame.columnconfigure(1, weight=1)
+        self.appsFrame.rowconfigure(0, weight=100)
+        self.appsFrame.rowconfigure(1, weight=1)
+
+        self.applicationsList = tk.Listbox(self.appsFrame)
+        self.applicationsList.bind('<<ListboxSelect>>', self.appSelection)
+        self.applicationsList.grid(row=0, column=0, sticky='nsew')
+        self.applicationsList.config(border=2, relief='sunken', font=("Purisa", 10))
+
+        self.appsVerticalScroll = tk.Scrollbar(self.appsFrame, orient=tk.VERTICAL, command=self.applicationsList.yview)
+        self.appsVerticalScroll.grid(row=0, column=1, sticky='nsw')
+        self.applicationsList['yscrollcommand'] = self.appsVerticalScroll.set
+
+        self.appsHorizontalScroll = tk.Scrollbar(self.appsFrame, orient=tk.HORIZONTAL, command=self.applicationsList.xview)
+        self.appsHorizontalScroll.grid(row=1, column=0, sticky='sew')
+        self.applicationsList['xscrollcommand'] = self.appsHorizontalScroll.set
+
+        for zone in self.summedTime:
+            self.applicationsList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
+
+    def instancesFrameDeclaration(self):
+        self.instancesFrame.grid(row=2, column=1, sticky='nsew')
+        self.instancesFrame.config(border=5)
+        self.instancesFrame.columnconfigure(0, weight=100)
+        self.instancesFrame.columnconfigure(1, weight=1)
+        self.instancesFrame.rowconfigure(0, weight=100)
+        self.instancesFrame.rowconfigure(1, weight=1)
+
+        self.instancesList = tk.Listbox(self.instancesFrame)
+        self.instancesList.grid(row=0, column=0, sticky='nsew')
+        self.instancesList.config(border=2, relief='sunken', font=("Purisa", 10))
+
+        self.instancesVerticalScroll = tk.Scrollbar(self.instancesFrame, orient=tk.VERTICAL, command=self.instancesList.yview)
+        self.instancesVerticalScroll.grid(row=0, column=1, sticky='nsw')
+        self.instancesList['yscrollcommand'] = self.instancesVerticalScroll.set
+
+        self.instancesHorizontalScroll = tk.Scrollbar(self.instancesFrame, orient=tk.HORIZONTAL, command=self.instancesList.xview)
+        self.instancesHorizontalScroll.grid(row=1, column=0, sticky='sew')
+        self.instancesList['xscrollcommand'] = self.instancesHorizontalScroll.set
+
+    def drawingPieChart(self, percentage=percentageTime, totalTime=summedTime):
+        fig = matplotlib.figure.Figure(figsize=(6, 6))
+        ax = fig.add_subplot(111)
+        ax.pie(percentage, labels=[x[0] for x in totalTime], autopct='%1.f%%', explode=[0.01 for x in totalTime], startangle=0, labeldistance=1.2)
+
+        canvas = FigureCanvasTkAgg(fig, master=self.pieFrame)
+        canvas.get_tk_widget().grid(row=1, column=0, columnspan=2, sticky='nsew')
+        canvas.draw()
+
+    def dateSelection(self, value):
+        for k in self.listOfFiles.keys():
+            if k == value:
+                self.applicationsList.delete(0, 'end')
+                self.instancesList.delete(0, 'end')
+
+                self.data = jO.defDecodingJson(self.listOfFiles[k])
+                self.summedTime = jO.defSummingUpTotalTime(self.data)
+                self.percentageTime = jO.defPercentageCalculation(self.summedTime)
+                self.sortedInstances = jO.defSortedInstances(self.data)
+
+                for zone in self.summedTime:
+                    self.applicationsList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
+
+                self.drawingPieChart(percentage=self.percentageTime, totalTime=self.summedTime)
+
+    def appSelection(self, evt):
+        self.selectedApp = str((self.applicationsList.get(self.applicationsList.curselection())))
+        self.selectedApp = self.selectedApp[:-11]
+
+        for key in self.sortedInstances.keys():
+            if key == self.selectedApp:
+                self.instancesList.delete(0, 'end')
+                for x in range(len(self.sortedInstances[key])):
+                    self.instancesList.insert(tk.END, self.sortedInstances[key][x][0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(self.sortedInstances[key][x][1])))
+
+    def updateData(self):
+        self.listOfFiles = jO.defListOfFiles()
+        self.latestFile = jO.defFindingLatestFile(self.listOfFiles)
+
+        selectedDate = self.defaultDate.get()
+
+        if selectedDate == self.latestFile[0]:
+            selection = self.selectedApp
+            self.applicationsList.delete(0, 'end')
+            self.instancesList.delete(0, 'end')
+
+            self.data = jO.defDecodingJson(self.listOfFiles[selectedDate])
+            self.summedTime = jO.defSummingUpTotalTime(self.data)
+            self.percentageTime = jO.defPercentageCalculation(self.summedTime)
+            self.sortedInstances = jO.defSortedInstances(self.data)
+
+            for zone in self.summedTime:
+                self.applicationsList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
+
+            self.drawingPieChart(percentage=self.percentageTime, totalTime=self.summedTime)
+
+            if selection != None:
+                for key in self.sortedInstances.keys():
+                    if key == selection:
+                        self.instancesList.delete(0, 'end')
+
+                        for x in range(len(self.sortedInstances[key])):
+                            self.instancesList.insert(tk.END, self.sortedInstances[key][x][0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(self.sortedInstances[key][x][1])))
+
+        root.after(300000, self.updateData)
 
 
-# function, which updates applications and pie chart according to a choosen date
-def DateSelect(value):
-    for k in listOfFiles.keys():
-        if k == value:
-            applicationList.delete(0, 'end')
-            instancesList.delete(0,'end')
-            global data, summedTime, percentageTime, sortedInstances
-            data = jO.defDecodingJson(listOfFiles[k])
-            summedTime = jO.defSummingUpTotalTime(data)
-            percentageTime = jO.defPercentageCalculation(summedTime)
-            sortedInstances = jO.defSortedInstances(data)
-            for zone in summedTime:
-                applicationList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
-            defDrawingPie(percentage=percentageTime, totalTime=summedTime)
-
-
-# option menu for choosing date
-datesMenuLabel = Label(pieFrame, text="Data:")
-datesMenuLabel.grid(row=0, column=0, sticky='e')
-datesMenu = tk.OptionMenu(pieFrame, defaultDate, *listOfFiles.keys(), command=DateSelect)
-datesMenu.grid(row=0, column=1, sticky='w')
-
-
-# drawing pie chart function
-def defDrawingPie(percentage=percentageTime, totalTime=summedTime):
-    fig = matplotlib.figure.Figure(figsize=(5,5))
-    ax = fig.add_subplot(111)
-    ax.pie(percentage, labels=[x[0] for x in totalTime], autopct='%1.1f%%', explode=[0.01 for x in totalTime])
-    canvas = FigureCanvasTkAgg(fig, master=pieFrame)
-    canvas.get_tk_widget().grid(row=1, column=0, columnspan=2, sticky='nsew')
-    canvas.draw()
-
-
-defDrawingPie()
-
-# instances list declaration
-instancesList = tk.Listbox(instancesFrame)
-instancesList.grid(row=0, column=0, sticky='nsew')
-instancesList.config(border=2, relief='sunken')
-
-instancesScrollVertical = tk.Scrollbar(instancesFrame, orient=tk.VERTICAL, command=instancesList.yview)
-instancesScrollVertical.grid(row=0, column=1, sticky='nsw')
-instancesList['yscrollcommand'] = instancesScrollVertical.set
-
-instancesScrollHorizontal = tk.Scrollbar(instancesFrame, orient=tk.HORIZONTAL, command=instancesList.xview)
-instancesScrollHorizontal.grid(row=1, column=0, sticky='sew')
-instancesList['xscrollcommand'] = instancesScrollHorizontal.set
-
-
-# function, which updates instances list according to choosen application
-def AppSelect(evt):
-    value = str((applicationList.get(applicationList.curselection())))
-    value = value[:-11]
-
-    for key in sortedInstances.keys():
-        if key == value:
-            instancesList.delete(0,'end')
-            for x in range(len(sortedInstances[key])):
-                instancesList.insert(tk.END, sortedInstances[key][x][0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(sortedInstances[key][x][1])))
-
-
-# applications list declaration
-applicationList = tk.Listbox(appsFrame)
-applicationList.bind('<<ListboxSelect>>', AppSelect)
-applicationList.grid(row=0, column=0, sticky='nsew')
-applicationList.config(border=2, relief='sunken')
-for zone in summedTime:
-    applicationList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
-
-applicationScrollVertical = tk.Scrollbar(appsFrame, orient=tk.VERTICAL, command=applicationList.yview)
-applicationScrollVertical.grid(row=0, column=1, sticky='nsw')
-applicationList['yscrollcommand'] = applicationScrollVertical.set
-
-applicationScrollHorizontal = tk.Scrollbar(appsFrame, orient=tk.HORIZONTAL, command=applicationList.xview)
-applicationScrollHorizontal.grid(row=1, column=0, sticky='sew')
-applicationList['xscrollcommand'] = applicationScrollHorizontal.set
-
-# main loop
-window.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.geometry("1000x800")
+    my_gui = MainApplication(root)
+    root.mainloop()
