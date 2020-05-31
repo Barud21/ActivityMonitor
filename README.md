@@ -32,8 +32,8 @@ Minimal example of .json file:
   * Choosing date - you can check your activity from the past by choosing specific date from drop down menu.
   * Pie chart - it represents percentage usage time of each application.
   * Application list - list of all used applications with usage time in format HH:MM:SS.
-  * Instance list - choose an application in application list, click on it and in instance list will appear all
-    instances of chosen application with their usage time in format HH:MM:SS. ![instance list][List of instances]
+  * Instance list - choose an application in application list, click on it and instance list will show all
+    instances opened in chosen application with their usage time in format HH:MM:SS. ![instance list][List of instances]
   
 
 ## Limitations
