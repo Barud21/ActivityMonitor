@@ -22,7 +22,6 @@ def defFindingLatestFile(dictionary):
     return latestDate, latestFile
 
 
-# TODO: unit test for that
 def defDecodingJson(fileName):
     with open(fileName, 'r', encoding='utf8') as read_date:                              # opening the latest file in directory
         jsonData = json.load(read_date, cls=jF.CustomJsonDecoder)       # loading data to memory
