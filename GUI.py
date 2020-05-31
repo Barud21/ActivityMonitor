@@ -26,13 +26,14 @@ class MainApplication:
         master.columnconfigure(1, weight=1000)
         master.rowconfigure(0, weight=50)
         master.rowconfigure(1, weight=5000)
-        master.rowconfigure(2, weight=5000)
+        master.rowconfigure(2, weight=500)
+        master.rowconfigure(3, weight=5000)
 
         self.titleFrame = Frame(master)
         self.pieFrame = Frame(master)
-        self.appsFrame = LabelFrame(master, text="Lista aplikacji", font=("Purisa", 11))
+        self.appsFrame = LabelFrame(master, text="Application list", font=("Purisa", 11))
         self.applicationsList = tk.Listbox(self.appsFrame)
-        self.instancesFrame = LabelFrame(master, text="Lista instancji", font=("Purisa", 11))
+        self.instancesFrame = LabelFrame(master, text="Instance list", font=("Purisa", 11))
 
         self.defaultFile = self.latestFile[0]
         self.defaultDate = StringVar(self.pieFrame)
@@ -50,19 +51,19 @@ class MainApplication:
         self.titleFrame.config(border=10)
         self.titleFrame.columnconfigure(0, weight=10)
         self.titleFrame.rowconfigure(0, weight=10)
-        self.titleLabel = Label(self.titleFrame, text="Monitor aktywności - używasz na własną odpowiedzialność ;)")
+        self.titleLabel = Label(self.titleFrame, text="Activity Monitor - watch yourself!")
         self.titleLabel.grid(row=0, column=0, sticky='nsew')
         self.titleLabel.config(font=("Purisa", 14))
 
     def pieFrameDeclaration(self):
-        self.pieFrame.grid(row=1, column=0, rowspan=2, sticky='nsew')
+        self.pieFrame.grid(row=1, column=0, rowspan=3, sticky='nsew')
         self.pieFrame.config(border=5)
         self.pieFrame.columnconfigure(0, weight=10)
         self.pieFrame.columnconfigure(1, weight=10)
         self.pieFrame.rowconfigure(0, weight=1)
         self.pieFrame.rowconfigure(1, weight=10)
 
-        self.datesMenuLabel = Label(self.pieFrame, text="Data: ")
+        self.datesMenuLabel = Label(self.pieFrame, text="Date: ")
         self.datesMenuLabel.grid(row=0, column=0, sticky='e')
         self.datesMenuLabel.config(font=("Purisa", 12))
         self.datesMenu = tk.OptionMenu(self.pieFrame, self.defaultDate, *self.listOfFiles.keys(), command=self.dateSelection)
@@ -94,7 +95,7 @@ class MainApplication:
             self.applicationsList.insert(tk.END, zone[0] + ' - ' + time.strftime('%H:%M:%S', time.gmtime(zone[1])))
 
     def instancesFrameDeclaration(self):
-        self.instancesFrame.grid(row=2, column=1, sticky='nsew')
+        self.instancesFrame.grid(row=3, column=1, sticky='nsew')
         self.instancesFrame.config(border=5)
         self.instancesFrame.columnconfigure(0, weight=100)
         self.instancesFrame.columnconfigure(1, weight=1)
