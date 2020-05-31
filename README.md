@@ -37,7 +37,7 @@ Minimal example of .json file:
   * Instance list - choose an application in application list, click on it and instance list will show all
     instances opened in chosen application with their usage time in format HH:MM:SS.
     
-    ![instance list][List of instances]
+  ![instance list][List of instances]
   
 ## Limitations
 Windows only (Logger module bases on win32gui and pywinauto). Tested on Windows 10
